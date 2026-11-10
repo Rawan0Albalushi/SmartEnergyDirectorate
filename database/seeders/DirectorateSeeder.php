@@ -1,0 +1,410 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Enums\ContentOrigin;
+use App\Enums\NewsScope;
+use App\Enums\NewsStatus;
+use App\Enums\ProjectStatus;
+use App\Models\Achievement;
+use App\Models\Department;
+use App\Models\Indicator;
+use App\Models\NewsArticle;
+use App\Models\NewsSource;
+use App\Models\Project;
+use App\Models\Sector;
+use App\Models\StaffMember;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+
+class DirectorateSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $this->admin();
+
+        $sectors = $this->sectors();
+        $this->indicators($sectors);
+        $this->projects($sectors);
+        $this->achievements($sectors);
+        $this->news($sectors);
+        $this->sources($sectors);
+        $this->departments();
+    }
+
+    private function admin(): void
+    {
+        $email = config('directorate.admin_email');
+        $password = config('directorate.admin_password');
+
+        if (! is_string($email) || $email === '' || ! is_string($password) || $password === '') {
+            return;
+        }
+
+        User::query()->updateOrCreate(
+            ['email' => $email],
+            [
+                'name' => 'System administrator',
+                'password' => $password,
+                'email_verified_at' => now(),
+            ],
+        );
+    }
+
+    /**
+     * @return array<string, Sector>
+     */
+    private function sectors(): array
+    {
+        $rows = [
+            [
+                'slug' => 'renewable',
+                'name_ar' => 'الطاقة المتجددة',
+                'name_en' => 'Renewable energy',
+                'summary_ar' => 'القدرة المركبة ومساهمة المصادر المتجددة في التوليد.',
+                'summary_en' => 'Installed capacity and the share of renewable generation.',
+                'body_ar' => 'يتابع هذا القطاع محطات الشمس والرياح والطاقة الحيوية، ويعرض القدرة المركبة ونسبة المساهمة في الكهرباء المولدة. الأرقام تُدخل من الإدارة وتُحدَّث عند صدور قراءة جديدة.',
+                'body_en' => 'This sector follows solar, wind, and bioenergy plants. It publishes installed capacity and the share of generated electricity. Figures are entered by the directorate when a new reading is released.',
+                'sort_order' => 1,
+            ],
+            [
+                'slug' => 'hydrogen',
+                'name_ar' => 'الهيدروجين',
+                'name_en' => 'Hydrogen',
+                'summary_ar' => 'المشاريع التجريبية والطاقة الإنتاجية للهيدروجين منخفض الكربون.',
+                'summary_en' => 'Pilot projects and production capacity for low-carbon hydrogen.',
+                'body_ar' => 'يعرض القطاع مشاريع الهيدروجين التجريبي والتجاري، والطاقة الإنتاجية السنوية، وارتباطها بمصادر الكهرباء المتجددة.',
+                'body_en' => 'The sector lists pilot and commercial hydrogen projects, annual production capacity, and the link to renewable electricity.',
+                'sort_order' => 2,
+            ],
+            [
+                'slug' => 'electricity',
+                'name_ar' => 'الكهرباء',
+                'name_en' => 'Electricity',
+                'summary_ar' => 'الحمل الأقصى وفاقد الشبكة ومشاريع تقوية المنظومة.',
+                'summary_en' => 'Peak load, network losses, and grid reinforcement projects.',
+                'body_ar' => 'يجمع القطاع مؤشرات التشغيل الأساسية: الحمل الأقصى، فاقد الشبكة، ومشاريع محطات التحويل وخطوط النقل.',
+                'body_en' => 'The sector gathers the main operating indicators: peak load, network losses, and substation and transmission projects.',
+                'sort_order' => 3,
+            ],
+            [
+                'slug' => 'efficiency',
+                'name_ar' => 'كفاءة الطاقة',
+                'name_en' => 'Energy efficiency',
+                'summary_ar' => 'الطاقة الموفرة والمباني التي أُعيد تأهيلها.',
+                'summary_en' => 'Energy saved and buildings that have been retrofitted.',
+                'body_ar' => 'يتابع القطاع برامج الترشيد في المباني العامة والخاصة، وكمية الطاقة التي تم تجنب استهلاكها.',
+                'body_en' => 'The sector follows efficiency programmes in public and private buildings, and the energy consumption that was avoided.',
+                'sort_order' => 4,
+            ],
+        ];
+
+        $sectors = [];
+
+        foreach ($rows as $row) {
+            $sectors[$row['slug']] = Sector::query()->updateOrCreate(['slug' => $row['slug']], $row);
+        }
+
+        return $sectors;
+    }
+
+    /**
+     * @param  array<string, Sector>  $sectors
+     */
+    private function indicators(array $sectors): void
+    {
+        $rows = [
+            ['renewable', 'القدرة المركبة', 'Installed capacity', 650, 'ميغاواط', 'MW', '2025', '2025-12-01', 0],
+            ['renewable', 'مساهمة التوليد', 'Share of generation', 18, '٪', '%', '2025', '2025-06-01', 1],
+            ['hydrogen', 'الطاقة الإنتاجية السنوية', 'Annual production capacity', 800, 'طن', 'tonnes', '2025', '2025-12-01', 0],
+            ['hydrogen', 'مشاريع تجريبية', 'Pilot projects', 12, 'مشروع', 'projects', '2025', '2025-06-01', 1],
+            ['electricity', 'الحمل الأقصى', 'Peak load', 7.4, 'غيغاواط', 'GW', '2025', '2025-12-01', 0],
+            ['electricity', 'فاقد الشبكة', 'Network losses', 6.2, '٪', '%', '2025', '2025-06-01', 1],
+            ['efficiency', 'الطاقة الموفرة', 'Energy saved', 420, 'غيغاواط ساعة', 'GWh', '2025', '2025-12-01', 0],
+            ['efficiency', 'مبانٍ أعيد تأهيلها', 'Retrofitted buildings', 35, 'مبنى', 'buildings', '2025', '2025-06-01', 1],
+        ];
+
+        foreach ($rows as [$slug, $nameAr, $nameEn, $value, $unitAr, $unitEn, $period, $date, $sort]) {
+            Indicator::query()->updateOrCreate(
+                ['sector_id' => $sectors[$slug]->id, 'name_en' => $nameEn],
+                [
+                    'name_ar' => $nameAr,
+                    'value' => $value,
+                    'unit_ar' => $unitAr,
+                    'unit_en' => $unitEn,
+                    'period_label' => $period,
+                    'recorded_on' => $date,
+                    'is_published' => true,
+                    'sort_order' => $sort,
+                ],
+            );
+        }
+    }
+
+    /**
+     * @param  array<string, Sector>  $sectors
+     */
+    private function projects(array $sectors): void
+    {
+        $rows = [
+            [
+                'slug' => 'solar-plant-phase-one',
+                'sector' => 'renewable',
+                'title_ar' => 'محطة شمسية — المرحلة الأولى',
+                'title_en' => 'Solar plant, phase one',
+                'summary_ar' => 'محطة بقدرة 200 ميغاواط قيد التنفيذ، وترتبط بشبكة النقل الحالية.',
+                'summary_en' => 'A 200 MW plant under construction, connected to the existing transmission network.',
+                'body_ar' => 'تشمل المرحلة أعمال الموقع وربط المحطة. موعد التشغيل المستهدف خلال عام 2026، وتُحدَّث الحالة من لوحة الإدارة.',
+                'body_en' => 'This phase covers the site works and the grid connection. Commissioning is targeted during 2026, and the status is updated from the admin desk.',
+                'status' => ProjectStatus::Ongoing,
+                'location_ar' => 'المنطقة الداخلية',
+                'location_en' => 'Interior region',
+                'year' => 2026,
+            ],
+            [
+                'slug' => 'hydrogen-pilot',
+                'sector' => 'hydrogen',
+                'title_ar' => 'برنامج الهيدروجين التجريبي',
+                'title_en' => 'Hydrogen pilot programme',
+                'summary_ar' => 'وحدة تحليل كهربائي مرتبطة بمحطة طاقة متجددة، بطاقة مبدئية محدودة.',
+                'summary_en' => 'An electrolysis unit tied to a renewable plant, with a limited first capacity.',
+                'body_ar' => 'البرنامج ما زال في التخطيط. يقيس استهلاك الكهرباء لكل طن، ويحدد موقع التخزين قبل الانتقال إلى مرحلة التنفيذ.',
+                'body_en' => 'The programme is still being planned. It measures electricity used per tonne and fixes the storage site before construction starts.',
+                'status' => ProjectStatus::Planned,
+                'location_ar' => 'المنطقة الساحلية',
+                'location_en' => 'Coastal region',
+                'year' => 2027,
+            ],
+            [
+                'slug' => 'substation-upgrade',
+                'sector' => 'electricity',
+                'title_ar' => 'تحديث محطات التحويل',
+                'title_en' => 'Substation modernisation',
+                'summary_ar' => 'استبدال محولات ورفع سعة أربع محطات لخفض الاختناق في أوقات الذروة.',
+                'summary_en' => 'Replacing transformers and raising the capacity of four substations to ease peak congestion.',
+                'body_ar' => 'يجري العمل على محطتين، واثنتان في جدول العام نفسه. المؤشر المرتبط هو الحمل الأقصى وفاقد الشبكة.',
+                'body_en' => 'Work is underway at two sites, with two more scheduled in the same year. The related indicators are peak load and network losses.',
+                'status' => ProjectStatus::Ongoing,
+                'location_ar' => 'عدة مواقع',
+                'location_en' => 'Several sites',
+                'year' => 2025,
+            ],
+            [
+                'slug' => 'public-building-retrofit',
+                'sector' => 'efficiency',
+                'title_ar' => 'إعادة تأهيل المباني العامة',
+                'title_en' => 'Public building retrofit',
+                'summary_ar' => 'اكتمل تأهيل عشرين مبنى عبر الإضاءة والعزل وأنظمة التحكم.',
+                'summary_en' => 'Twenty buildings were retrofitted through lighting, insulation, and controls.',
+                'body_ar' => 'أُغلق البرنامج للدفعة الأولى. الطاقة الموفرة تُحسب سنويًا وتظهر في مؤشر كفاءة الطاقة.',
+                'body_en' => 'The first batch is closed. Avoided energy is calculated each year and appears in the efficiency indicator.',
+                'status' => ProjectStatus::Completed,
+                'location_ar' => 'المباني الحكومية',
+                'location_en' => 'Government buildings',
+                'year' => 2024,
+            ],
+        ];
+
+        foreach ($rows as $row) {
+            $sector = $row['sector'];
+            unset($row['sector']);
+            Project::query()->updateOrCreate(
+                ['slug' => $row['slug']],
+                [...$row, 'sector_id' => $sectors[$sector]->id, 'is_published' => true],
+            );
+        }
+    }
+
+    /**
+     * @param  array<string, Sector>  $sectors
+     */
+    private function achievements(array $sectors): void
+    {
+        $rows = [
+            ['نشر أول حزمة مؤشرات موحدة', 'First unified indicator release', 'أصبحت قراءات القطاعات الأربعة متاحة للجمهور في صفحة واحدة.', 'Readings for the four sectors are available to the public on one page.', 2025, 'renewable'],
+            ['اعتماد مصادر الأخبار', 'News sources approved', 'حُددت مصادر المتابعة، وتصل المواد الجديدة إلى المراجعة قبل ظهورها للزوار.', 'Monitoring sources were selected. New items reach review before visitors can see them.', 2025, null],
+            ['إغلاق دفعة التأهيل الأولى', 'First retrofit batch closed', 'اكتمل العمل في عشرين مبنى عامًا، وسُجلت الطاقة الموفرة في المؤشرات.', 'Work finished in twenty public buildings, and the energy saved was recorded.', 2024, 'efficiency'],
+        ];
+
+        foreach ($rows as [$titleAr, $titleEn, $summaryAr, $summaryEn, $year, $sector]) {
+            Achievement::query()->updateOrCreate(
+                ['title_en' => $titleEn],
+                [
+                    'title_ar' => $titleAr,
+                    'summary_ar' => $summaryAr,
+                    'summary_en' => $summaryEn,
+                    'year' => $year,
+                    'sector_id' => $sector === null ? null : $sectors[$sector]->id,
+                    'is_published' => true,
+                ],
+            );
+        }
+    }
+
+    /**
+     * @param  array<string, Sector>  $sectors
+     */
+    private function news(array $sectors): void
+    {
+        $rows = [
+            [
+                'slug' => 'indicator-release-2025',
+                'title_ar' => 'صدور قراءات عام 2025',
+                'title_en' => '2025 readings published',
+                'summary_ar' => 'نُشرت القدرة المركبة للطاقة المتجددة والحمل الأقصى وكمية الطاقة الموفرة.',
+                'summary_en' => 'Renewable capacity, peak load, and energy saved were published for 2025.',
+                'body_ar' => 'يمكن الاطلاع على التفاصيل داخل كل قطاع. القراءة التالية تُضاف من لوحة الإدارة عند اعتمادها.',
+                'body_en' => 'Details sit inside each sector. The next reading is added from the admin desk once it is approved.',
+                'scope' => NewsScope::Local,
+                'status' => NewsStatus::Published,
+                'sector' => 'renewable',
+                'published_at' => '2025-12-15 08:00:00',
+            ],
+            [
+                'slug' => 'hydrogen-pilot-note',
+                'title_ar' => 'تحديد موقع البرنامج التجريبي للهيدروجين',
+                'title_en' => 'Hydrogen pilot site selected',
+                'summary_ar' => 'اختير موقع ساحلي للوحدة التجريبية، وما زال البرنامج في مرحلة التخطيط.',
+                'summary_en' => 'A coastal site was selected for the pilot unit. The programme remains in planning.',
+                'body_ar' => 'لا يبدأ التنفيذ قبل اكتمال دراسة الربط الكهربائي. صفحة المشروع تعرض الحالة الحالية.',
+                'body_en' => 'Construction does not start before the grid-connection study is complete. The project page shows the current state.',
+                'scope' => NewsScope::Local,
+                'status' => NewsStatus::Published,
+                'sector' => 'hydrogen',
+                'published_at' => '2026-02-02 08:00:00',
+            ],
+            [
+                'slug' => 'international-grid-note',
+                'title_ar' => 'متابعة دولية لتخزين الكهرباء',
+                'title_en' => 'International note on electricity storage',
+                'summary_ar' => 'ترصد المديرية تجارب التخزين المرتبطة بالمصادر المتجددة، وتنشر الخلاصة بعد المراجعة.',
+                'summary_en' => 'The directorate follows storage trials linked to renewable generation and publishes a summary after review.',
+                'body_ar' => 'هذه مادة تحرير يدوي. الأخبار المجلوبة آليًا تبقى في قائمة المراجعة حتى يعتمدها المسؤول.',
+                'body_en' => 'This item was written by hand. Automatically fetched news stays in the review list until an editor publishes it.',
+                'scope' => NewsScope::International,
+                'status' => NewsStatus::Published,
+                'sector' => 'electricity',
+                'published_at' => '2026-03-11 08:00:00',
+            ],
+            [
+                'slug' => 'awaiting-review-sample',
+                'title_ar' => null,
+                'title_en' => 'Sample item waiting for review',
+                'summary_ar' => null,
+                'summary_en' => 'This item is not visible to visitors until it is published.',
+                'body_ar' => null,
+                'body_en' => null,
+                'scope' => NewsScope::International,
+                'status' => NewsStatus::Pending,
+                'sector' => null,
+                'published_at' => '2026-04-01 08:00:00',
+            ],
+        ];
+
+        foreach ($rows as $row) {
+            $sector = $row['sector'];
+            unset($row['sector']);
+            NewsArticle::query()->updateOrCreate(
+                ['slug' => $row['slug']],
+                [
+                    ...$row,
+                    'sector_id' => $sector === null ? null : $sectors[$sector]->id,
+                    'origin' => ContentOrigin::Manual,
+                    'source_name' => 'Directorate desk',
+                ],
+            );
+        }
+    }
+
+    /**
+     * @param  array<string, Sector>  $sectors
+     */
+    private function sources(array $sectors): void
+    {
+        $rows = [
+            [
+                'name_ar' => 'متابعة عربية للطاقة المتجددة',
+                'name_en' => 'Arabic renewable energy coverage',
+                'feed_url' => 'https://news.google.com/rss/search?q='.rawurlencode('الطاقة المتجددة').'&hl=ar&gl=AE&ceid=AE:ar',
+                'locale' => 'ar',
+                'scope' => NewsScope::Local,
+                'sector_id' => $sectors['renewable']->id,
+            ],
+            [
+                'name_ar' => 'تغطية دولية للطاقة المتجددة',
+                'name_en' => 'International renewable energy coverage',
+                'feed_url' => 'https://news.google.com/rss/search?q=renewable+energy&hl=en-US&gl=US&ceid=US:en',
+                'locale' => 'en',
+                'scope' => NewsScope::International,
+                'sector_id' => $sectors['renewable']->id,
+            ],
+        ];
+
+        foreach ($rows as $row) {
+            NewsSource::query()->updateOrCreate(
+                ['feed_url' => $row['feed_url']],
+                [...$row, 'is_active' => true],
+            );
+        }
+    }
+
+    private function departments(): void
+    {
+        $rows = [
+            ['planning', 'التخطيط والدراسات', 'Planning and studies', 'إعداد المؤشرات ومتابعة المنهجية.', 'Prepares indicators and looks after the method.', 'يعتمد القراءات قبل نشرها ويتابع اتساق السلاسل الزمنية.', 'Approves readings before publication and keeps the time series consistent.', 'planning@energy.local', '0000 0000', 1],
+            ['renewables', 'الطاقة المتجددة', 'Renewable energy', 'متابعة الشمس والرياح والطاقة الحيوية.', 'Follows solar, wind, and bioenergy.', 'يمسك سجل القدرة المركبة ومشاريع الربط.', 'Keeps the installed-capacity register and connection projects.', 'renewables@energy.local', '0000 0001', 2],
+            ['hydrogen', 'الهيدروجين', 'Hydrogen', 'متابعة البرامج التجريبية والإنتاج.', 'Follows pilot programmes and production.', 'يراجع أرقام الطاقة الإنتاجية وربطها بالكهرباء.', 'Reviews production figures and their link to electricity.', 'hydrogen@energy.local', '0000 0002', 3],
+            ['power', 'الكهرباء', 'Electricity', 'الحمل والفاقد ومشاريع الشبكة.', 'Load, losses, and network projects.', 'ينسق مع تشغيل الشبكة على القراءات الدورية.', 'Coordinates periodic readings with network operations.', 'power@energy.local', '0000 0003', 4],
+            ['efficiency', 'كفاءة الطاقة', 'Energy efficiency', 'برامج الترشيد في المباني.', 'Efficiency programmes in buildings.', 'يحسب الطاقة الموفرة لكل دفعة تأهيل.', 'Calculates energy saved for each retrofit batch.', 'efficiency@energy.local', '0000 0004', 5],
+            ['communications', 'الاتصال المؤسسي', 'Communications', 'الأخبار المحلية والدولية.', 'Local and international news.', 'يراجع المواد المجلوبة وينشر ما يُعتمد منها.', 'Reviews fetched items and publishes what is approved.', 'news@energy.local', '0000 0005', 6],
+        ];
+
+        $staff = [
+            'planning' => [['ليلى الحسن', 'Layla Al Hasan', 'رئيسة القسم', 'Head of section'], ['يوسف كريم', 'Yousef Kareem', 'محلل مؤشرات', 'Indicator analyst']],
+            'renewables' => [['مريم سعيد', 'Maryam Saeed', 'أخصائية شمس ورياح', 'Solar and wind specialist'], ['حسن البلوشي', 'Hassan Al Balushi', 'مهندس ربط', 'Connection engineer']],
+            'hydrogen' => [['سارة ناصر', 'Sara Nasser', 'أخصائية هيدروجين', 'Hydrogen specialist']],
+            'power' => [['خالد محمود', 'Khalid Mahmoud', 'مهندس شبكة', 'Network engineer']],
+            'efficiency' => [['نورة فهد', 'Noura Fahad', 'أخصائية ترشيد', 'Efficiency specialist']],
+            'communications' => [['هدى سالم', 'Huda Salem', 'محررة أخبار', 'News editor']],
+        ];
+
+        foreach ($rows as [$slug, $nameAr, $nameEn, $summaryAr, $summaryEn, $mandateAr, $mandateEn, $email, $phone, $sort]) {
+            $department = Department::query()->updateOrCreate(
+                ['slug' => $slug],
+                [
+                    'name_ar' => $nameAr,
+                    'name_en' => $nameEn,
+                    'summary_ar' => $summaryAr,
+                    'summary_en' => $summaryEn,
+                    'mandate_ar' => $mandateAr,
+                    'mandate_en' => $mandateEn,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'sort_order' => $sort,
+                ],
+            );
+
+            foreach ($staff[$slug] as $index => [$staffAr, $staffEn, $titleAr, $titleEn]) {
+                StaffMember::query()->updateOrCreate(
+                    ['department_id' => $department->id, 'name_en' => $staffEn],
+                    [
+                        'name_ar' => $staffAr,
+                        'title_ar' => $titleAr,
+                        'title_en' => $titleEn,
+                        'email' => $this->staffEmail($staffEn, $slug),
+                        'is_published' => true,
+                        'sort_order' => $index + 1,
+                    ],
+                );
+            }
+        }
+    }
+
+    private function staffEmail(string $name, string $department): string
+    {
+        $local = strtolower((string) preg_replace('/[^a-z]+/i', '.', $name));
+        $local = trim($local, '.');
+
+        return $local.'@'.$department.'.energy.local';
+    }
+}
