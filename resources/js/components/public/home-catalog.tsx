@@ -1,18 +1,36 @@
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, BarChart3, Building2, ClipboardList, Leaf, Plus, Share2, Zap, type LucideIcon } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import {
+    ArrowLeft,
+    BatteryCharging,
+    Building2,
+    ChartColumn,
+    ClipboardList,
+    Database,
+    Layers,
+    LayoutGrid,
+    Leaf,
+    Share2,
+    SunMedium,
+    Zap,
+    type LucideIcon,
+} from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { SectorGlyph } from '@/components/public/entry';
 import { FieldPhoto } from '@/components/public/field-photo';
 import { departmentPlates } from '@/lib/department-plates';
 import { horizon } from '@/lib/fields';
 import { formatNumber } from '@/lib/format';
 import { useI18n, type Locale } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 import type { DepartmentSummary, IndicatorReading, SectorHome } from '@/types/content';
 
-const sectorIcons: Record<string, LucideIcon> = {
-    renewable: Leaf,
-    electricity: Zap,
-    efficiency: BarChart3,
-};
+const cardTones = [
+    { plate: 'bg-[#e7f3fb]', ink: 'text-[#2b6f9a]' },
+    { plate: 'bg-[#e7f6ec]', ink: 'text-[#217a45]' },
+    { plate: 'bg-[#fff1e8]', ink: 'text-[#d26522]' },
+    { plate: 'bg-[#e7f7f5]', ink: 'text-[#1d8f86]' },
+    { plate: 'bg-[#f3eefb]', ink: 'text-[#6d56c8]' },
+];
 
 const departmentIcons: Record<string, LucideIcon> = {
     planning: ClipboardList,
@@ -30,192 +48,186 @@ export function HomeIndicators({
     indicators: IndicatorReading[];
 }) {
     const { t, locale } = useI18n();
-    const [active, setActive] = useState(sectors[0]?.slug ?? '');
-    const sector = sectors.find((item) => item.slug === active) ?? sectors[0];
-    const rows = sector ? indicators.filter((item) => item.sector?.slug === sector.slug) : [];
-    const headline = sector?.headline ?? rows[0] ?? null;
-    const updated = headline ? readingStamp(headline.recordedOn, locale) : null;
+    const [active, setActive] = useState<string | null>(null);
+    const featured = sectors.find((sector) => sector.slug === active) ?? null;
+    const rows = featured ? indicators.filter((item) => item.sector?.slug === featured.slug) : indicators;
 
     return (
         <section className="mx-auto max-w-[90rem] px-4 py-10 sm:px-6 lg:px-6 lg:py-14" aria-labelledby="home-indicators">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="min-w-0 max-w-xl">
-                    <p className="text-sm font-medium text-[#6b5424]">{t('indicatorsEyebrow')}</p>
-                    <h2 id="home-indicators" className="mt-2 text-3xl font-medium text-deep sm:text-4xl">
-                        {sector ? (locale === 'ar' ? `قطاع ${sector.name}` : `${sector.name} sector`) : t('indicators')}
-                    </h2>
-                    <p className="mt-2 text-sm leading-7 text-[#3E534C]">{sector ? sector.summary : t('indicatorsHomeLede')}</p>
-                </div>
-                <Link
-                    href={`/${locale}/indicators`}
-                    className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-white ps-3 pe-1.5 text-sm text-ink"
-                >
-                    {t('allIndicators')}
-                    <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#e7f1ee] text-deep">
-                        <ArrowLeft className="size-4 ltr:scale-x-[-1]" aria-hidden="true" />
-                    </span>
-                </Link>
+            <div className="max-w-xl">
+                <h2 id="home-indicators" className="text-3xl font-medium text-deep sm:text-4xl">
+                    {t('indicatorsEyebrow')}
+                </h2>
+                <p className="mt-2 text-sm leading-7 text-[#3E534C]">{t('indicatorsHomeLede')}</p>
             </div>
 
             {sectors.length > 0 ? (
-                <div className="mt-8 flex flex-wrap items-center" role="tablist" aria-label={t('sectors')}>
-                    {sectors.map((item, index) => {
-                        const selected = item.slug === sector?.slug;
-                        const previousSelected = index > 0 && sectors[index - 1]?.slug === sector?.slug;
-
-                        return (
-                            <Fragment key={item.slug}>
-                                {index > 0 ? (
-                                    <span
-                                        className={selected || previousSelected ? 'mx-1 w-2' : 'mx-1 h-4 w-px bg-line'}
-                                        aria-hidden="true"
-                                    />
-                                ) : null}
-                                <button
-                                    type="button"
-                                    role="tab"
-                                    id={`home-sector-tab-${item.slug}`}
-                                    aria-selected={selected}
-                                    aria-controls="home-indicators-panel"
-                                    onClick={() => setActive(item.slug)}
-                                    className={
-                                        selected
-                                            ? 'inline-flex min-h-11 items-center gap-2 rounded-full bg-deep px-4 text-sm text-white'
-                                            : 'inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm text-[#244038] hover:bg-white'
-                                    }
-                                >
-                                    <SectorGlyph slug={item.slug} />
-                                    {item.name}
-                                </button>
-                            </Fragment>
-                        );
-                    })}
+                <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label={t('sectors')}>
+                    <FilterPill current={active === null} onSelect={() => setActive(null)} id="home-sector-tab-all">
+                        <LayoutGrid className="size-3.5" aria-hidden="true" />
+                        {t('all')}
+                    </FilterPill>
+                    {sectors.map((sector) => (
+                        <FilterPill
+                            key={sector.slug}
+                            current={active === sector.slug}
+                            onSelect={() => setActive(sector.slug)}
+                            id={`home-sector-tab-${sector.slug}`}
+                        >
+                            <SectorGlyph slug={sector.slug} className="size-3.5" />
+                            {sector.name}
+                        </FilterPill>
+                    ))}
                 </div>
             ) : null}
 
             <div
                 id="home-indicators-panel"
                 role="tabpanel"
-                aria-labelledby={sector ? `home-sector-tab-${sector.slug}` : 'home-indicators'}
-                className="mt-6 grid items-start gap-4 lg:grid-cols-[minmax(16rem,0.78fr)_minmax(0,1.45fr)]"
+                aria-labelledby={featured ? `home-sector-tab-${featured.slug}` : 'home-sector-tab-all'}
+                className="mt-6"
             >
-                <article className="relative min-h-[26rem] overflow-hidden rounded-[1.75rem] bg-deep">
-                    {sector ? <FieldPhoto slug={sector.slug} alt="" className="absolute inset-0 h-full w-full object-cover" /> : null}
-                    <div className="absolute inset-0 bg-gradient-to-r from-white via-white/75 to-transparent rtl:bg-gradient-to-l" />
-                    <div className="relative flex min-h-[26rem] flex-col justify-end p-5 sm:p-7">
-                        {sector ? (
-                            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/80 px-3 py-1 text-xs text-deep ring-1 ring-black/5">
-                                <SectorGlyph slug={sector.slug} />
-                                {sector.name}
-                            </span>
-                        ) : null}
-                        {headline ? (
-                            <>
-                                <p className="mt-5 text-6xl font-medium tracking-tight text-deep tabular-nums sm:text-7xl">
-                                    {formatNumber(headline.value, locale)}
-                                </p>
-                                <p className="mt-1 text-base text-[#244038]">{headline.unit}</p>
-                                <p className="mt-4 text-lg font-medium text-deep">{headline.name}</p>
-                            </>
-                        ) : (
-                            <p className="mt-5 text-sm text-[#244038]">{t('noReading')}</p>
-                        )}
-                        {updated ? (
-                            <p className="mt-3 text-xs text-[#3E534C]">
-                                {t('updatedThrough')} {updated.label}
-                            </p>
-                        ) : null}
-                        {sector ? (
-                            <Link
-                                href={`/${locale}/sectors#${sector.slug}`}
-                                className="mt-5 inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-deep ps-1.5 pe-4 text-sm text-white"
-                            >
-                                <span className="inline-flex size-8 items-center justify-center rounded-full bg-white/15">
-                                    <Plus className="size-4" aria-hidden="true" />
-                                </span>
-                                {t('sectorDetails')}
-                            </Link>
-                        ) : null}
+                {rows.length === 0 ? (
+                    <p className="text-sm text-[#3E534C]">{t('emptyIndicators')}</p>
+                ) : (
+                    <div className="grid items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+                        <ul className="grid h-full grid-cols-2 gap-4 lg:grid-cols-4">
+                            {rows.map((indicator, index) => (
+                                <ReadingCard key={indicator.id} indicator={indicator} index={index} locale={locale} />
+                            ))}
+                        </ul>
+                        <StageCard
+                            featured={featured}
+                            title={featured ? featured.name : t('indicatorsStageTitle')}
+                            lede={featured ? featured.summary : t('indicatorsStageLede')}
+                            href={featured ? `/${locale}/sectors#${featured.slug}` : `/${locale}/sectors`}
+                            action={featured ? t('sectorDetails') : t('allSectors')}
+                        />
                     </div>
-                </article>
-
-                <div>
-                    {rows.length === 0 ? <p className="text-sm text-[#3E534C]">{t('emptyIndicators')}</p> : null}
-                    {rows.length > 0 ? (
-                        <div className="hidden shrink-0 border-b border-line px-2 pb-3 text-xs text-[#5c6f68] sm:grid sm:grid-cols-[minmax(0,1.5fr)_8.5rem_6.5rem_1.5rem] sm:gap-4">
-                            <span>{t('indicatorName')}</span>
-                            <span>{t('currentValue')}</span>
-                            <span>{t('lastUpdate')}</span>
-                            <span className="sr-only">{t('readMore')}</span>
-                        </div>
-                    ) : null}
-                    <ul>
-                        {rows.map((indicator) => {
-                            const stamp = readingStamp(indicator.recordedOn, locale);
-
-                            return (
-                                <li key={indicator.id} className="border-b border-line">
-                                    <Link
-                                        href={sector ? `/${locale}/indicators?sector=${sector.slug}` : `/${locale}/indicators`}
-                                        className="grid w-full gap-2 py-4 hover:bg-white sm:grid-cols-[minmax(0,1.5fr)_8.5rem_6.5rem_1.5rem] sm:items-center sm:gap-4 sm:px-2"
-                                    >
-                                        <span className="flex items-center gap-3">
-                                            <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-line bg-white text-sea">
-                                                <SectorGlyph slug={indicator.sector?.slug ?? sector?.slug ?? ''} />
-                                            </span>
-                                            <span className="text-sm font-medium leading-6 text-ink">{indicator.name}</span>
-                                        </span>
-                                        <span>
-                                            <span className="block text-2xl font-medium tracking-tight text-deep tabular-nums">
-                                                {formatNumber(indicator.value, locale)}
-                                            </span>
-                                            <span className="text-xs text-[#3E534C]">{indicator.unit}</span>
-                                        </span>
-                                        <span>
-                                            <span className="block text-sm text-ink">{stamp.year}</span>
-                                            <span className="text-xs text-[#3E534C]">{stamp.month}</span>
-                                        </span>
-                                        <ArrowLeft className="size-4 text-sea ltr:scale-x-[-1]" aria-hidden="true" />
-                                    </Link>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </div>
+                )}
             </div>
         </section>
     );
 }
 
-function SectorGlyph({ slug }: { slug: string }) {
-    if (slug === 'hydrogen') {
-        return (
-            <span className="text-sm leading-none font-medium" aria-hidden="true">
-                H₂
-            </span>
-        );
-    }
-
-    const Icon = sectorIcons[slug] ?? Leaf;
-
-    return <Icon className="size-4" aria-hidden="true" />;
+function FilterPill({
+    current,
+    onSelect,
+    id,
+    children,
+}: {
+    current: boolean;
+    onSelect: () => void;
+    id: string;
+    children: ReactNode;
+}) {
+    return (
+        <button
+            type="button"
+            role="tab"
+            id={id}
+            aria-selected={current}
+            aria-controls="home-indicators-panel"
+            onClick={onSelect}
+            className={
+                current
+                    ? 'inline-flex min-h-11 items-center gap-1.5 rounded-full bg-deep px-4 text-sm text-white shadow-[0_8px_18px_rgba(12,46,42,0.18)]'
+                    : 'inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[#e7eeea] bg-white px-4 text-sm text-ink shadow-[0_6px_16px_rgba(18,36,51,0.05)] hover:bg-[#f7faf8]'
+            }
+        >
+            {children}
+        </button>
+    );
 }
 
-function readingStamp(value: string, locale: Locale): { year: string; month: string; label: string } {
-    const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
-    const date = match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : new Date(value);
+function ReadingCard({ indicator, index, locale }: { indicator: IndicatorReading; index: number; locale: Locale }) {
+    const tone = cardTones[index % cardTones.length];
+    const Icon = readingIcon(indicator.unit, indicator.sector?.slug ?? '');
 
-    if (Number.isNaN(date.getTime())) {
-        return { year: value, month: '', label: value };
+    return (
+        <li className="flex h-full min-h-40 flex-col items-center justify-center rounded-[1.35rem] bg-white px-3 py-5 text-center shadow-[0_10px_28px_rgba(18,36,51,0.05)]">
+            <span className={cn('grid size-12 place-items-center rounded-2xl', tone.plate, tone.ink)}>
+                <Icon className="size-5" aria-hidden="true" />
+            </span>
+            <p className={cn('mt-3 text-3xl font-semibold tracking-tight tabular-nums', tone.ink)}>
+                {formatNumber(indicator.value, locale)}
+                <span className="ms-1 text-sm font-medium">{indicator.unit}</span>
+            </p>
+            <p className="mt-1.5 text-sm leading-6 text-[#5c6f68]">{indicator.name}</p>
+        </li>
+    );
+}
+
+function StageCard({
+    featured,
+    title,
+    lede,
+    href,
+    action,
+}: {
+    featured: SectorHome | null;
+    title: string;
+    lede: string;
+    href: string;
+    action: string;
+}) {
+    return (
+        <article className="relative flex h-full min-h-72 flex-col overflow-hidden rounded-[1.6rem] bg-deep text-white max-lg:order-first">
+            <FieldPhoto
+                slug={featured?.slug ?? 'renewable'}
+                horizon={featured === null}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover object-[center_68%]"
+            />
+            <span className="absolute inset-0 bg-gradient-to-b from-deep/72 via-deep/5 to-deep/55" aria-hidden="true" />
+            <div className="relative flex flex-1 flex-col p-5 sm:p-6">
+                <span className="grid size-11 place-items-center rounded-full bg-white/15 text-measure">
+                    {featured ? <SectorGlyph slug={featured.slug} className="size-5" /> : <Leaf className="size-5" aria-hidden="true" />}
+                </span>
+                <h3 className="mt-4 max-w-xs text-2xl font-medium leading-8">{title}</h3>
+                {lede ? <p className="mt-2 max-w-xs text-sm leading-7 text-[#F4F7F5]">{lede}</p> : null}
+                <Link
+                    href={href}
+                    className="mt-6 inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-white ps-1.5 pe-4 text-sm text-deep lg:mt-auto"
+                >
+                    <span className="grid size-8 place-items-center rounded-full bg-[#e7f1ee]">
+                        <ArrowLeft className="size-4 ltr:scale-x-[-1]" aria-hidden="true" />
+                    </span>
+                    {action}
+                </Link>
+            </div>
+        </article>
+    );
+}
+
+function readingIcon(unit: string, sector: string): LucideIcon {
+    const normalized = unit.replace(/\s/g, '').replace('٪', '%').toLowerCase();
+
+    if (normalized === '%') {
+        return ChartColumn;
     }
 
-    const tag = locale === 'ar' ? 'ar' : 'en';
+    if (normalized.includes('tonne') || normalized.includes('طن')) {
+        return Database;
+    }
 
-    return {
-        year: new Intl.DateTimeFormat(tag, { year: 'numeric' }).format(date),
-        month: new Intl.DateTimeFormat(tag, { month: 'long' }).format(date),
-        label: new Intl.DateTimeFormat(tag, { month: 'long', year: 'numeric' }).format(date),
-    };
+    if (normalized.includes('project') || normalized.includes('مشروع')) {
+        return Layers;
+    }
+
+    if (normalized.includes('building') || normalized.includes('مبن')) {
+        return Building2;
+    }
+
+    if (normalized.includes('wh') || normalized.includes('ساعة')) {
+        return BatteryCharging;
+    }
+
+    if (normalized.includes('واط') || normalized === 'mw' || normalized === 'gw') {
+        return sector === 'electricity' ? Zap : SunMedium;
+    }
+
+    return SunMedium;
 }
 
 export function HomeDepartments({ departments }: { departments: DepartmentSummary[] }) {

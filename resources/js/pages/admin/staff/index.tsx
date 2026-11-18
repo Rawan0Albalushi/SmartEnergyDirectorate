@@ -1,9 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
 import { Pager } from '@/components/public/pager';
-import { useI18n } from '@/lib/i18n';
+import { label, useI18n } from '@/lib/i18n';
 import type { PageMeta } from '@/types/content';
 
-type Row = { name: string; title: string; department: string; isPublished: boolean; editUrl: string };
+type Row = { name: string; title: string; department: string; roster: string; isPublished: boolean; editUrl: string };
 
 export default function StaffIndex({ staff, page }: { staff: Row[]; page: PageMeta }) {
     const { t, locale } = useI18n();
@@ -20,7 +20,7 @@ export default function StaffIndex({ staff, page }: { staff: Row[]; page: PageMe
                     <li key={member.editUrl} className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
                         <span>
                             <span className="block text-lg">{member.name}</span>
-                            <span className="text-sm text-[#3E534C]">{member.title} · {member.department} · {member.isPublished ? t('visible') : t('hidden')}</span>
+                            <span className="text-sm text-[#3E534C]">{member.title} · {member.department} · {label(locale, member.roster)} · {member.isPublished ? t('visible') : t('hidden')}</span>
                         </span>
                         <Link href={member.editUrl} className="inline-flex min-h-11 items-center underline">{t('edit')}</Link>
                     </li>

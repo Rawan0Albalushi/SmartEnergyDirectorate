@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\StaffRoster;
 use App\Models\Concerns\HasLocalizedText;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id
@@ -16,17 +18,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $name_en
  * @property string $title_ar
  * @property string $title_en
+ * @property string|null $bio_ar
+ * @property string|null $bio_en
  * @property string|null $email
+ * @property string|null $photo_path
+ * @property StaffRoster $roster
  * @property bool $is_published
  * @property int $sort_order
  * @property Department|null $department
  */
 #[Fillable([
     'department_id',
+    'roster',
     'name_ar',
     'name_en',
     'title_ar',
     'title_en',
+    'bio_ar',
+    'bio_en',
     'email',
     'is_published',
     'sort_order',
@@ -42,7 +51,17 @@ class StaffMember extends Model
     {
         return [
             'is_published' => 'boolean',
+            'roster' => StaffRoster::class,
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (StaffMember $member): void {
+            if (is_string($member->photo_path) && $member->photo_path !== '') {
+                Storage::disk('public')->delete($member->photo_path);
+            }
+        });
     }
 
     /**
@@ -64,7 +83,7 @@ class StaffMember extends Model
     }
 
     /**
-     * @return array{id: int, name: string, title: string, email: ?string}
+     * @return array{id: int, name: string, title: string, email: ?string, bio: string, photoUrl: ?string, department: ?string}
      */
     public function toPublicArray(): array
     {
@@ -73,6 +92,13 @@ class StaffMember extends Model
             'name' => $this->localized('name'),
             'title' => $this->localized('title'),
             'email' => $this->email,
+            'bio' => $this->localized('bio'),
+            'photoUrl' => is_string($this->photo_path) && $this->photo_path !== ''
+                ? Storage::disk('public')->url($this->photo_path)
+                : null,
+            'department' => $this->relationLoaded('department')
+                ? $this->department?->localized('name')
+                : null,
         ];
     }
 }

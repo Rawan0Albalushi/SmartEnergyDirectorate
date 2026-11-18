@@ -92,6 +92,9 @@ export type StaffPublic = {
     name: string;
     title: string;
     email: string | null;
+    bio: string;
+    photoUrl: string | null;
+    department: string | null;
 };
 
 export type Option = {

@@ -15,7 +15,6 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Site\AchievementController;
 use App\Http\Controllers\Site\DepartmentController;
 use App\Http\Controllers\Site\HomeController;
-use App\Http\Controllers\Site\IndicatorController;
 use App\Http\Controllers\Site\NewsController;
 use App\Http\Controllers\Site\ProjectController;
 use App\Http\Controllers\Site\SectorController;
@@ -51,7 +50,6 @@ Route::prefix('{locale}')
         Route::get('/', HomeController::class)->name('site.home');
         Route::get('sectors', [SectorController::class, 'index'])->name('site.sectors.index');
         Route::get('sectors/{sector}', [SectorController::class, 'show'])->name('site.sectors.show');
-        Route::get('indicators', [IndicatorController::class, 'index'])->name('site.indicators.index');
         Route::get('projects', [ProjectController::class, 'index'])->name('site.projects.index');
         Route::get('projects/{project}', [ProjectController::class, 'show'])->name('site.projects.show');
         Route::get('achievements', [AchievementController::class, 'index'])->name('site.achievements.index');

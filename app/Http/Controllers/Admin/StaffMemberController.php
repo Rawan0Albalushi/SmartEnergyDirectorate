@@ -8,6 +8,7 @@ use App\Models\StaffMember;
 use App\Support\CatalogOptions;
 use App\Support\PageMeta;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,6 +27,7 @@ class StaffMemberController extends Controller
                 'name' => $member->localized('name'),
                 'title' => $member->localized('title'),
                 'department' => $member->department?->localized('name') ?? '',
+                'roster' => $member->roster->value,
                 'isPublished' => $member->is_published,
                 'editUrl' => route('admin.staff.edit', [
                     'locale' => app()->getLocale(),
@@ -66,7 +68,13 @@ class StaffMemberController extends Controller
                 'name_en' => $staffMember->name_en,
                 'title_ar' => $staffMember->title_ar,
                 'title_en' => $staffMember->title_en,
+                'bio_ar' => $staffMember->bio_ar ?? '',
+                'bio_en' => $staffMember->bio_en ?? '',
                 'email' => $staffMember->email,
+                'roster' => $staffMember->roster->value,
+                'photo_url' => is_string($staffMember->photo_path) && $staffMember->photo_path !== ''
+                    ? Storage::disk('public')->url($staffMember->photo_path)
+                    : null,
                 'is_published' => $staffMember->is_published,
                 'sort_order' => $staffMember->sort_order,
             ],
@@ -106,13 +114,37 @@ class StaffMemberController extends Controller
     {
         $member->fill($request->safe()->only([
             'department_id',
+            'roster',
             'name_ar',
             'name_en',
             'title_ar',
             'title_en',
+            'bio_ar',
+            'bio_en',
             'email',
             'is_published',
         ]));
         $member->sort_order = $request->integer('sort_order');
+        $this->storePhoto($request, $member);
+    }
+
+    private function storePhoto(SaveStaffMemberRequest $request, StaffMember $member): void
+    {
+        if (! $request->hasFile('photo') && ! $request->boolean('remove_photo')) {
+            return;
+        }
+
+        $previous = $member->photo_path;
+
+        if ($request->hasFile('photo')) {
+            $stored = $request->file('photo')?->store('staff', 'public');
+            $member->photo_path = is_string($stored) ? $stored : $previous;
+        } else {
+            $member->photo_path = null;
+        }
+
+        if (is_string($previous) && $previous !== '' && $previous !== $member->photo_path) {
+            Storage::disk('public')->delete($previous);
+        }
     }
 }

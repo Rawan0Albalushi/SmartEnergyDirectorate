@@ -7,7 +7,6 @@ import { useI18n, type TranslationKey } from '@/lib/i18n';
 const links: { key: TranslationKey; path: string }[] = [
     { key: 'home', path: '' },
     { key: 'sectors', path: '/sectors' },
-    { key: 'indicators', path: '/indicators' },
     { key: 'projects', path: '/projects' },
     { key: 'achievements', path: '/achievements' },
     { key: 'news', path: '/news' },

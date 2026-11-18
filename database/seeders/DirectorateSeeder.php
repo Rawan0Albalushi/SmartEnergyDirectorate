@@ -6,6 +6,7 @@ use App\Enums\ContentOrigin;
 use App\Enums\NewsScope;
 use App\Enums\NewsStatus;
 use App\Enums\ProjectStatus;
+use App\Enums\StaffRoster;
 use App\Models\Achievement;
 use App\Models\Department;
 use App\Models\Indicator;
@@ -385,12 +386,17 @@ class DirectorateSeeder extends Seeder
             );
 
             foreach ($staff[$slug] as $index => [$staffAr, $staffEn, $titleAr, $titleEn]) {
+                $profile = $this->profiles()[$staffEn];
+
                 StaffMember::query()->updateOrCreate(
                     ['department_id' => $department->id, 'name_en' => $staffEn],
                     [
                         'name_ar' => $staffAr,
                         'title_ar' => $titleAr,
                         'title_en' => $titleEn,
+                        'bio_ar' => $profile['ar'],
+                        'bio_en' => $profile['en'],
+                        'roster' => StaffRoster::Staff,
                         'email' => $this->staffEmail($staffEn, $slug),
                         'is_published' => true,
                         'sort_order' => $index + 1,
@@ -398,6 +404,85 @@ class DirectorateSeeder extends Seeder
                 );
             }
         }
+
+        $planning = Department::query()->where('slug', 'planning')->firstOrFail();
+        $board = [
+            ['أحمد الرواحي', 'Ahmed Al Rawahi', 'رئيس مجلس الإدارة', 'Chair'],
+            ['فاطمة المعمرية', 'Fatima Al Maamari', 'عضو مجلس الإدارة', 'Board member'],
+            ['سالم الحارثي', 'Salem Al Harthi', 'عضو مجلس الإدارة', 'Board member'],
+        ];
+
+        foreach ($board as $index => [$nameAr, $nameEn, $titleAr, $titleEn]) {
+            $profile = $this->profiles()[$nameEn];
+
+            StaffMember::query()->updateOrCreate(
+                ['department_id' => $planning->id, 'name_en' => $nameEn],
+                [
+                    'name_ar' => $nameAr,
+                    'title_ar' => $titleAr,
+                    'title_en' => $titleEn,
+                    'bio_ar' => $profile['ar'],
+                    'bio_en' => $profile['en'],
+                    'roster' => StaffRoster::Board,
+                    'email' => $this->staffEmail($nameEn, 'board'),
+                    'is_published' => true,
+                    'sort_order' => $index + 1,
+                ],
+            );
+        }
+    }
+
+    /**
+     * @return array<string, array{ar: string, en: string}>
+     */
+    private function profiles(): array
+    {
+        return [
+            'Layla Al Hasan' => [
+                'ar' => 'ترأس قسم التخطيط والدراسات، وتتابع منهجية المؤشرات قبل اعتماد القراءات للنشر.',
+                'en' => 'Heads planning and studies, and checks the indicator method before readings are published.',
+            ],
+            'Yousef Kareem' => [
+                'ar' => 'يراجع السلاسل الزمنية ويتابع اتساق الأرقام المنشورة في مؤشرات القطاع.',
+                'en' => 'Reviews the time series and keeps published sector indicators consistent.',
+            ],
+            'Maryam Saeed' => [
+                'ar' => 'تتابع القدرة المركبة لمشاريع الشمس والرياح والطاقة الحيوية.',
+                'en' => 'Follows installed capacity for solar, wind, and bioenergy projects.',
+            ],
+            'Hassan Al Balushi' => [
+                'ar' => 'يتابع ربط مشاريع الطاقة المتجددة بالشبكة الكهربائية.',
+                'en' => 'Follows the connection of renewable projects to the electricity network.',
+            ],
+            'Sara Nasser' => [
+                'ar' => 'تراجع أرقام الطاقة الإنتاجية في برامج الهيدروجين التجريبية.',
+                'en' => 'Reviews production figures for hydrogen pilot programmes.',
+            ],
+            'Khalid Mahmoud' => [
+                'ar' => 'ينسق القراءات الدورية للحمل والفاقد مع تشغيل الشبكة.',
+                'en' => 'Coordinates periodic load and loss readings with network operations.',
+            ],
+            'Noura Fahad' => [
+                'ar' => 'تحسب الطاقة الموفرة في برامج الترشيد داخل المباني.',
+                'en' => 'Calculates energy saved by efficiency programmes in buildings.',
+            ],
+            'Huda Salem' => [
+                'ar' => 'تراجع الأخبار المحلية والدولية قبل اعتمادها للنشر.',
+                'en' => 'Reviews local and international news before it is approved for publication.',
+            ],
+            'Ahmed Al Rawahi' => [
+                'ar' => 'يرأس مجلس الإدارة ويتابع توجه المديرية وارتباطه بأهداف قطاع الطاقة.',
+                'en' => 'Chairs the board and follows how the directorate lines up with energy-sector goals.',
+            ],
+            'Fatima Al Maamari' => [
+                'ar' => 'تتابع وضوح البيانات المنشورة وحوكمة اعتمادها قبل أن تصل إلى الزوار.',
+                'en' => 'Follows how clearly published data is governed before visitors see it.',
+            ],
+            'Salem Al Harthi' => [
+                'ar' => 'يتابع أولويات الأقسام ومواءمتها مع خطة القطاع.',
+                'en' => 'Follows section priorities and how they match the sector plan.',
+            ],
+        ];
     }
 
     private function staffEmail(string $name, string $department): string
