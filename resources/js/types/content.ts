@@ -18,6 +18,11 @@ export type SectorDetail = SectorSummary & {
     body: string;
 };
 
+export type SectorRecord = SectorDetail & {
+    indicators: IndicatorReading[];
+    projects: ProjectSummary[];
+};
+
 export type IndicatorReading = {
     id: number;
     name: string;

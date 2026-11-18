@@ -25,7 +25,7 @@ export default function ProjectShow({ project }: { project: ProjectDetail }) {
                 {project.body ? <p className="max-w-3xl text-base leading-8">{project.body}</p> : null}
                 {project.sector ? (
                     <p className={project.body ? 'mt-8' : ''}>
-                        <ForwardLink href={`/${locale}/sectors/${project.sector.slug}`}>{project.sector.name}</ForwardLink>
+                        <ForwardLink href={`/${locale}/sectors#${project.sector.slug}`}>{project.sector.name}</ForwardLink>
                     </p>
                 ) : null}
             </PageBody>

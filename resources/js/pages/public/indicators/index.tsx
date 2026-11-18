@@ -84,7 +84,7 @@ export default function IndicatorsIndex({
                                 featured={featured}
                                 title={featured ? featured.name : t('indicatorsStageTitle')}
                                 lede={featured ? featured.summary : t('indicatorsStageLede')}
-                                href={featured ? `/${locale}/sectors/${featured.slug}` : `/${locale}/indicators`}
+                                href={featured ? `/${locale}/sectors#${featured.slug}` : `/${locale}/indicators`}
                                 action={featured ? t('sectorDetails') : t('allIndicators')}
                             />
                         </div>

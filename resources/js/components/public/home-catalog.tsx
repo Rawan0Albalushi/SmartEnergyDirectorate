@@ -127,7 +127,7 @@ export function HomeIndicators({
                         ) : null}
                         {sector ? (
                             <Link
-                                href={`/${locale}/sectors/${sector.slug}`}
+                                href={`/${locale}/sectors#${sector.slug}`}
                                 className="mt-5 inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-deep ps-1.5 pe-4 text-sm text-white"
                             >
                                 <span className="inline-flex size-8 items-center justify-center rounded-full bg-white/15">

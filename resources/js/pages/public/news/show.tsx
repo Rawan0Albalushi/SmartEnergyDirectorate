@@ -22,7 +22,7 @@ export default function NewsShow({ article }: { article: NewsDetail }) {
                 {article.body ? <p className="max-w-3xl text-base leading-8">{article.body}</p> : null}
                 {article.sector ? (
                     <p className={article.body ? 'mt-8' : ''}>
-                        <ForwardLink href={`/${locale}/sectors/${article.sector.slug}`}>{article.sector.name}</ForwardLink>
+                        <ForwardLink href={`/${locale}/sectors#${article.sector.slug}`}>{article.sector.name}</ForwardLink>
                     </p>
                 ) : null}
                 {article.sourceName || article.originalUrl ? (
