@@ -1,7 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,22 +8,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/login';
-import { request } from '@/routes/password';
-import PasskeyVerify from '@/components/passkey-verify';
 
 type Props = {
     status?: string;
-    canResetPassword: boolean;
 };
 
-export default function Login({ status, canResetPassword }: Props) {
+export default function Login({ status }: Props) {
     const { t } = useI18n();
 
     return (
         <>
             <Head title={t('logIn')} />
-
-            <PasskeyVerify />
 
             <Form
                 {...store.form()}
@@ -50,18 +44,7 @@ export default function Login({ status, canResetPassword }: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">{t('password')}</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ms-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            {t('forgotPassword')}
-                                        </TextLink>
-                                    )}
-                                </div>
+                                <Label htmlFor="password">{t('password')}</Label>
                                 <PasswordInput
                                     id="password"
                                     name="password"

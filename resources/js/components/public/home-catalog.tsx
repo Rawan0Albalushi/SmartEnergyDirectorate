@@ -4,12 +4,10 @@ import {
     BatteryCharging,
     Building2,
     ChartColumn,
-    ClipboardList,
     Database,
     Layers,
     LayoutGrid,
     Leaf,
-    Share2,
     SunMedium,
     Zap,
     type LucideIcon,
@@ -17,12 +15,10 @@ import {
 import { useState, type ReactNode } from 'react';
 import { SectorGlyph } from '@/components/public/entry';
 import { FieldPhoto } from '@/components/public/field-photo';
-import { departmentPlates } from '@/lib/department-plates';
-import { horizon } from '@/lib/fields';
 import { formatNumber } from '@/lib/format';
 import { useI18n, type Locale } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
-import type { DepartmentSummary, IndicatorReading, SectorHome } from '@/types/content';
+import type { IndicatorReading, SectorHome } from '@/types/content';
 
 const cardTones = [
     { plate: 'bg-[#e7f3fb]', ink: 'text-[#2b6f9a]' },
@@ -31,14 +27,6 @@ const cardTones = [
     { plate: 'bg-[#e7f7f5]', ink: 'text-[#1d8f86]' },
     { plate: 'bg-[#f3eefb]', ink: 'text-[#6d56c8]' },
 ];
-
-const departmentIcons: Record<string, LucideIcon> = {
-    planning: ClipboardList,
-    renewables: Leaf,
-    power: Zap,
-    efficiency: Building2,
-    communications: Share2,
-};
 
 export function HomeIndicators({
     sectors,
@@ -228,82 +216,4 @@ function readingIcon(unit: string, sector: string): LucideIcon {
     }
 
     return SunMedium;
-}
-
-export function HomeDepartments({ departments }: { departments: DepartmentSummary[] }) {
-    const { t, locale } = useI18n();
-
-    return (
-        <section className="relative mx-4 my-6 overflow-hidden rounded-3xl sm:mx-6 lg:mx-auto lg:mb-16 lg:max-w-[90rem]" aria-labelledby="home-departments">
-            <img src={horizon.src} alt="" className="absolute inset-0 h-full w-full object-cover object-[center_42%]" />
-            <div className="absolute inset-0 bg-[#f4f7f5]/80" />
-            <div className="relative px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="min-w-0 max-w-xl">
-                        <p className="flex items-center gap-2 text-sm font-medium text-[#6b5424]">
-                            <span className="h-px w-8 bg-[#c6a15b]" aria-hidden="true" />
-                            {t('departments')}
-                        </p>
-                        <h2 id="home-departments" className="mt-2 text-3xl font-medium text-deep sm:text-4xl">
-                            {t('departmentsHeading')}
-                        </h2>
-                        <p className="mt-2 text-sm leading-7 text-[#3E534C]">{t('departmentsHomeLede')}</p>
-                    </div>
-                    <Link
-                        href={`/${locale}/departments`}
-                        className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-white ps-3 pe-1.5 text-sm text-ink"
-                    >
-                        {t('allDepartments')}
-                        <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#e7f1ee] text-deep">
-                            <ArrowLeft className="size-4 ltr:scale-x-[-1]" aria-hidden="true" />
-                        </span>
-                    </Link>
-                </div>
-
-                {departments.length === 0 ? <p className="mt-8 text-sm text-[#3E534C]">{t('emptyDepartments')}</p> : null}
-                <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {departments.map((department) => {
-                        const plate = departmentPlates[department.slug] ?? { src: horizon.src, position: 'object-center' };
-                        const Icon = departmentIcons[department.slug];
-
-                        return (
-                            <li key={department.slug}>
-                                <Link
-                                    href={`/${locale}/departments/${department.slug}`}
-                                    className="flex h-full min-h-44 flex-col-reverse gap-3 rounded-2xl bg-white p-3 shadow-[0_16px_40px_-28px_rgba(12,46,42,0.7)] ring-1 ring-white sm:flex-row sm:items-stretch"
-                                >
-                                    <span className="flex min-w-0 flex-1 flex-col py-1 sm:py-2 sm:ps-1">
-                                        <span className="flex items-center gap-2 text-lg font-medium text-deep">
-                                            {department.name}
-                                            {department.slug === 'hydrogen' ? (
-                                                <span className="text-base leading-none text-sea" aria-hidden="true">
-                                                    H₂
-                                                </span>
-                                            ) : Icon ? (
-                                                <Icon className="size-5 shrink-0 text-sea" aria-hidden="true" />
-                                            ) : null}
-                                        </span>
-                                        <span className="mt-2 line-clamp-3 text-sm leading-6 text-[#3E534C]">{department.summary}</span>
-                                        <span className="mt-auto inline-flex min-h-11 items-center gap-2 pt-3 text-sm text-sea">
-                                            {t('readMore')}
-                                            <span className="inline-flex size-7 items-center justify-center rounded-full bg-[#e7f1ee]">
-                                                <ArrowLeft className="size-3.5 ltr:scale-x-[-1]" aria-hidden="true" />
-                                            </span>
-                                        </span>
-                                    </span>
-                                    <span className="relative block h-44 overflow-hidden rounded-xl sm:h-auto sm:w-40 sm:self-stretch">
-                                        <img
-                                            src={plate.src}
-                                            alt=""
-                                            className={`h-full w-full object-cover sm:absolute sm:inset-0 ${plate.position}`}
-                                        />
-                                    </span>
-                                </Link>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </div>
-        </section>
-    );
 }

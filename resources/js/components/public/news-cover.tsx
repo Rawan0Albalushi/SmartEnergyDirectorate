@@ -8,16 +8,19 @@ export function NewsCover({
     article,
     className = '',
     titleClassName = 'text-xl sm:text-2xl',
+    tabIndex,
 }: {
     article: NewsSummary;
     className?: string;
     titleClassName?: string;
+    tabIndex?: number;
 }) {
     const { locale } = useI18n();
 
     return (
         <Link
             href={`/${locale}/news/${article.slug}`}
+            tabIndex={tabIndex}
             className={`group relative block overflow-hidden rounded-2xl bg-deep ${className}`}
         >
             <NewsPhoto article={article} />

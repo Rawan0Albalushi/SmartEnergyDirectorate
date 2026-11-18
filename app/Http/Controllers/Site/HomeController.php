@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\Achievement;
-use App\Models\Department;
 use App\Models\Indicator;
 use App\Models\NewsArticle;
 use App\Models\Project;
@@ -35,7 +34,7 @@ class HomeController extends Controller
                 ->with('sector')
                 ->orderByDesc('published_at')
                 ->orderByDesc('id')
-                ->limit(9)
+                ->limit(12)
                 ->get()
                 ->map(fn (NewsArticle $article): array => $article->toSummaryArray())
                 ->values(),
@@ -57,12 +56,6 @@ class HomeController extends Controller
                 ->limit(4)
                 ->get()
                 ->map(fn (Achievement $achievement): array => $achievement->toPublicArray())
-                ->values(),
-            'departments' => Department::query()
-                ->orderBy('sort_order')
-                ->orderBy('id')
-                ->get()
-                ->map(fn (Department $department): array => $department->toSummaryArray())
                 ->values(),
             'indicators' => Indicator::query()
                 ->published()

@@ -56,8 +56,13 @@ function NewsStrip({
     const frame = useRef<HTMLDivElement>(null);
     const dragged = useRef(false);
     const startX = useRef<number | null>(null);
+    const pointerOver = useRef(false);
+    const focusInside = useRef(false);
     const [width, setWidth] = useState(0);
     const [page, setPage] = useState(0);
+    const [held, setHeld] = useState(false);
+    const [hidden, setHidden] = useState(false);
+    const [reduceMotion, setReduceMotion] = useState(false);
 
     useEffect(() => {
         const node = frame.current;
@@ -74,6 +79,26 @@ function NewsStrip({
         return () => observer.disconnect();
     }, []);
 
+    useEffect(() => {
+        const sync = () => setHidden(document.hidden);
+        document.addEventListener('visibilitychange', sync);
+
+        return () => document.removeEventListener('visibilitychange', sync);
+    }, []);
+
+    useEffect(() => {
+        const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const sync = () => setReduceMotion(media.matches);
+        sync();
+        media.addEventListener('change', sync);
+
+        return () => media.removeEventListener('change', sync);
+    }, []);
+
+    function syncHold() {
+        setHeld(pointerOver.current || focusInside.current);
+    }
+
     const gapPx = gap * 16;
     const columns = width > 0 && width < 640 ? 1 : width > 0 && width < 1024 ? 2 : 3;
     const fitted = width === 0 ? cardWidth * 16 : (width - gapPx * (columns - 1)) / columns;
@@ -87,21 +112,55 @@ function NewsStrip({
     const PreviousIcon = dir === 'rtl' ? ChevronRight : ChevronLeft;
     const NextIcon = dir === 'rtl' ? ChevronLeft : ChevronRight;
 
+    const loopPx = news.length * (fitted + gapPx);
+    const marquee = news.length > 3 && width > 0 && loopPx > width && !reduceMotion;
+
     function go(next: number) {
         setPage(Math.min(Math.max(next, 0), pages - 1));
     }
 
     return (
-        <div className="mt-8">
+        <div
+            className="mt-8"
+            onPointerEnter={() => {
+                pointerOver.current = true;
+                syncHold();
+            }}
+            onPointerLeave={(event) => {
+                pointerOver.current = false;
+
+                if (!event.currentTarget.contains(document.activeElement)) {
+                    focusInside.current = false;
+                }
+
+                syncHold();
+            }}
+            onFocusCapture={() => {
+                focusInside.current = true;
+                syncHold();
+            }}
+            onBlurCapture={(event) => {
+                const next = event.relatedTarget;
+
+                if (!(next instanceof Node) || !event.currentTarget.contains(next)) {
+                    focusInside.current = false;
+                    syncHold();
+                }
+            }}
+        >
             <div
                 ref={frame}
                 className="overflow-hidden"
                 style={{ touchAction: 'pan-y' }}
                 onPointerDown={(event) => {
+                    if (marquee) {
+                        return;
+                    }
+
                     startX.current = event.clientX;
                 }}
                 onPointerUp={(event) => {
-                    if (startX.current === null) {
+                    if (marquee || startX.current === null) {
                         return;
                     }
 
@@ -127,17 +186,30 @@ function NewsStrip({
                 }}
             >
                 <ul
-                    className="flex transition-transform duration-500 ease-out"
-                    style={{ gap: `${gap}rem`, transform: width === 0 ? undefined : `translateX(${sign * shift}px)` }}
+                    className={`flex ${marquee ? 'news-marquee' : 'transition-transform duration-700 ease-out motion-reduce:transition-none'}`}
+                    style={{
+                        gap: `${gap}rem`,
+                        '--news-loop': `${loopPx}px`,
+                        animationDuration: marquee ? `${loopPx / 64}s` : undefined,
+                        animationPlayState: held || hidden ? 'paused' : 'running',
+                        transform: marquee || width === 0 ? undefined : `translateX(${sign * shift}px)`,
+                    }}
                 >
                     {news.map((article) => (
                         <li key={article.slug} className="shrink-0" style={{ width: width === 0 ? `${cardWidth}rem` : `${fitted}px` }}>
                             <NewsCover article={article} className="h-[21rem]" />
                         </li>
                     ))}
+                    {marquee
+                        ? news.map((article) => (
+                              <li key={`${article.slug}-loop`} className="shrink-0" aria-hidden="true" style={{ width: `${fitted}px` }}>
+                                  <NewsCover article={article} className="h-[21rem]" tabIndex={-1} />
+                              </li>
+                          ))
+                        : null}
                 </ul>
             </div>
-            {pages > 1 ? (
+            {!marquee && pages > 1 ? (
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
                     <StripButton label={previousLabel} disabled={current === 0} onClick={() => go(current - 1)}>
                         <PreviousIcon className="size-4" aria-hidden="true" />

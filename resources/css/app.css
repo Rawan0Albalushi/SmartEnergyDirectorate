@@ -267,6 +267,42 @@ html[dir='rtl'] .field-sun {
     }
 }
 
+.news-marquee {
+    animation-name: news-drift;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+html[dir='rtl'] .news-marquee {
+    animation-name: news-drift-rtl;
+}
+
+@keyframes news-drift {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(var(--news-loop) * -1));
+    }
+}
+
+@keyframes news-drift-rtl {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(var(--news-loop));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .news-marquee {
+        animation: none;
+    }
+}
+
 .portrait-card {
     isolation: isolate;
     display: block;

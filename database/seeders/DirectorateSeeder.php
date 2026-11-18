@@ -42,14 +42,17 @@ class DirectorateSeeder extends Seeder
             return;
         }
 
-        User::query()->updateOrCreate(
+        $user = User::query()->updateOrCreate(
             ['email' => $email],
             [
                 'name' => 'System administrator',
                 'password' => $password,
-                'email_verified_at' => now(),
             ],
         );
+
+        if ($user->email_verified_at === null) {
+            $user->forceFill(['email_verified_at' => now()])->save();
+        }
     }
 
     /**
@@ -286,6 +289,97 @@ class DirectorateSeeder extends Seeder
                 'status' => NewsStatus::Published,
                 'sector' => 'electricity',
                 'published_at' => '2026-03-11 08:00:00',
+            ],
+            [
+                'slug' => 'solar-connection-batch',
+                'title_ar' => 'ربط دفعة جديدة من المحطات الشمسية',
+                'title_en' => 'New solar plants connected',
+                'summary_ar' => 'أُضيفت قدرة شمسية جديدة إلى سجل الربط، وستظهر في مؤشر القدرة المركبة بعد اعتماد القراءة.',
+                'summary_en' => 'New solar capacity was added to the connection register and will appear in installed capacity after the reading is approved.',
+                'body_ar' => 'الدفعة تشمل محطات موزعة على أكثر من موقع. التفاصيل التشغيلية تبقى داخل قطاع الطاقة المتجددة.',
+                'body_en' => 'The batch covers plants at more than one site. Operating detail stays inside the renewable energy sector.',
+                'scope' => NewsScope::Local,
+                'status' => NewsStatus::Published,
+                'sector' => 'renewable',
+                'published_at' => '2026-09-04 08:00:00',
+            ],
+            [
+                'slug' => 'coastal-wind-reading',
+                'title_ar' => 'تحديث قراءة الرياح على الساحل',
+                'title_en' => 'Coastal wind reading updated',
+                'summary_ar' => 'نُشرت قراءة محدّثة لإنتاج الرياح الساحلي ضمن سلسلة مؤشرات عام 2026.',
+                'summary_en' => 'An updated coastal wind reading was published in the 2026 indicator series.',
+                'body_ar' => 'القراءة لا تغيّر حالة المشاريع القائمة. صفحة القطاع تعرض الرقم بعد المراجعة.',
+                'body_en' => 'The reading does not change the status of existing projects. The sector page shows the figure after review.',
+                'scope' => NewsScope::Local,
+                'status' => NewsStatus::Published,
+                'sector' => 'renewable',
+                'published_at' => '2026-08-18 08:00:00',
+            ],
+            [
+                'slug' => 'building-retrofit-round',
+                'title_ar' => 'انطلاق دفعة جديدة لتأهيل المباني',
+                'title_en' => 'New building retrofit round starts',
+                'summary_ar' => 'بدأت دفعة تأهيل للمباني العامة، وتُحتسب الطاقة المتجنَّبة عند إغلاق الأعمال.',
+                'summary_en' => 'A new retrofit round for public buildings has started. Avoided energy is counted when the work closes.',
+                'body_ar' => 'القائمة تشمل مبانٍ إدارية ومدارس. الرقم النهائي يُضاف إلى مؤشر كفاءة الطاقة.',
+                'body_en' => 'The list includes administrative buildings and schools. The final figure is added to the efficiency indicator.',
+                'scope' => NewsScope::Local,
+                'status' => NewsStatus::Published,
+                'sector' => 'efficiency',
+                'published_at' => '2026-07-22 08:00:00',
+            ],
+            [
+                'slug' => 'substation-reinforcement',
+                'title_ar' => 'أعمال تقوية في محطة تحويل',
+                'title_en' => 'Reinforcement work at a substation',
+                'summary_ar' => 'بدأت أعمال تقوية في محطة تحويل لرفع قدرة الاستيعاب قبل موسم الحمل الأعلى.',
+                'summary_en' => 'Reinforcement work started at a substation to raise capacity ahead of the peak-load season.',
+                'body_ar' => 'العمل لا يغيّر رقم الحمل الأقصى المنشور. التحديث التالي يصدر بعد القياس.',
+                'body_en' => 'The work does not change the published peak-load figure. The next update follows measurement.',
+                'scope' => NewsScope::Local,
+                'status' => NewsStatus::Published,
+                'sector' => 'electricity',
+                'published_at' => '2026-06-09 08:00:00',
+            ],
+            [
+                'slug' => 'school-efficiency-note',
+                'title_ar' => 'ملاحظة عن ترشيد الاستهلاك في المدارس',
+                'title_en' => 'Note on efficiency in schools',
+                'summary_ar' => 'رُصدت دفعة قياس للاستهلاك في مدارس مختارة ضمن برنامج كفاءة الطاقة.',
+                'summary_en' => 'A measurement batch recorded consumption in selected schools under the efficiency programme.',
+                'body_ar' => 'النتائج الأولية للمراجعة الداخلية، ولا تُنشر كمؤشر إلا بعد الاعتماد.',
+                'body_en' => 'Early results stay in internal review and are not published as an indicator until approved.',
+                'scope' => NewsScope::Local,
+                'status' => NewsStatus::Published,
+                'sector' => 'efficiency',
+                'published_at' => '2026-05-14 08:00:00',
+            ],
+            [
+                'slug' => 'hydrogen-study-update',
+                'title_ar' => 'تحديث دراسة الربط لبرنامج الهيدروجين',
+                'title_en' => 'Hydrogen connection study updated',
+                'summary_ar' => 'اكتملت مراجعة أولية لدراسة الربط الكهربائي، والبرنامج ما زال في التخطيط.',
+                'summary_en' => 'A first review of the grid-connection study is complete. The programme remains in planning.',
+                'body_ar' => 'لا يوجد قرار تنفيذ بعد هذه المراجعة. صفحة المشروع تبقى مصدر الحالة.',
+                'body_en' => 'This review is not a construction decision. The project page remains the source of status.',
+                'scope' => NewsScope::Local,
+                'status' => NewsStatus::Published,
+                'sector' => 'hydrogen',
+                'published_at' => '2026-04-20 08:00:00',
+            ],
+            [
+                'slug' => 'storage-trial-summary',
+                'title_ar' => 'خلاصة متابعة لتجارب تخزين الكهرباء',
+                'title_en' => 'Summary of electricity storage trials',
+                'summary_ar' => 'نُشرت خلاصة قصيرة عن تجارب تخزين مرتبطة بالتوليد المتجدد بعد مراجعة التحرير.',
+                'summary_en' => 'A short summary of storage trials linked to renewable generation was published after editorial review.',
+                'body_ar' => 'المادة للمتابعة العامة ولا تمثّل اعتماد تقنية للشبكة المحلية.',
+                'body_en' => 'The note is for general follow-up and does not adopt a technology for the local grid.',
+                'scope' => NewsScope::International,
+                'status' => NewsStatus::Published,
+                'sector' => 'electricity',
+                'published_at' => '2026-04-08 08:00:00',
             ],
             [
                 'slug' => 'awaiting-review-sample',

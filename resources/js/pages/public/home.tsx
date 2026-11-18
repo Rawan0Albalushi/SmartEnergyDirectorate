@@ -1,13 +1,13 @@
 import { Head } from '@inertiajs/react';
 import { FieldPhoto } from '@/components/public/field-photo';
 import { HomeAchievements } from '@/components/public/home-achievements';
-import { HomeDepartments, HomeIndicators } from '@/components/public/home-catalog';
+import { HomeIndicators } from '@/components/public/home-catalog';
 import { HomeDigest } from '@/components/public/home-digest';
 import { HomeProjects } from '@/components/public/home-projects';
 import { PortraitCard } from '@/components/public/portrait-card';
 import { fieldPlate, horizon } from '@/lib/fields';
 import { useI18n } from '@/lib/i18n';
-import type { AchievementItem, DepartmentSummary, IndicatorReading, NewsSummary, ProjectSummary, SectorHome } from '@/types/content';
+import type { AchievementItem, IndicatorReading, NewsSummary, ProjectSummary, SectorHome } from '@/types/content';
 
 export default function Home({
     sectors,
@@ -16,7 +16,6 @@ export default function Home({
     projects,
     projectTotal,
     achievements,
-    departments,
 }: {
     sectors: SectorHome[];
     indicators: IndicatorReading[];
@@ -24,7 +23,6 @@ export default function Home({
     projects: ProjectSummary[];
     projectTotal: number;
     achievements: AchievementItem[];
-    departments: DepartmentSummary[];
 }) {
     const { t, locale } = useI18n();
 
@@ -70,8 +68,6 @@ export default function Home({
             <HomeAchievements achievements={achievements} />
 
             <HomeDigest news={news} />
-
-            <HomeDepartments departments={departments} />
         </>
     );
 }
