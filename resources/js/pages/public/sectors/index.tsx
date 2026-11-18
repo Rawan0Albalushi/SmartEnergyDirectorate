@@ -12,28 +12,53 @@ export default function SectorsIndex({ sectors }: { sectors: SectorDetail[] }) {
         <>
             <Head title={t('sectors')} />
             <PageIntro title={t('sectors')} lede={t('sectorsIntro')} />
-            <PageBody>
-                <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    {sectors.map((sector) => (
-                        <li key={sector.slug} className="h-full">
-                            <Link
-                                href={`/${locale}/sectors/${sector.slug}`}
-                                className="group flex h-full min-h-72 flex-col overflow-hidden rounded-2xl bg-[#0a2422] text-[#F4F7F5] shadow-[0_16px_40px_-28px_rgba(12,46,42,0.7)] ring-1 ring-black/10 focus-visible:outline-white"
+            {sectors.length === 0 ? (
+                <PageBody>
+                    <p className="text-sm text-[#3E534C]">{t('emptySectors')}</p>
+                </PageBody>
+            ) : (
+                sectors.map((sector, index) => {
+                    const flipped = index % 2 === 1;
+
+                    return (
+                        <section
+                            key={sector.slug}
+                            id={sector.slug}
+                            aria-labelledby={`sector-${sector.slug}`}
+                            className={`scroll-mt-28 ${index % 2 === 0 ? 'bg-[#f4f7f5]' : 'bg-white'}`}
+                        >
+                            <div
+                                className={`mx-auto grid max-w-[90rem] items-center gap-10 px-4 py-16 sm:px-6 lg:gap-16 lg:px-6 lg:py-24 ${flipped ? 'lg:grid-cols-[6fr_5fr]' : 'lg:grid-cols-[5fr_6fr]'}`}
                             >
-                                <span className="field-thumb">
-                                    <FieldPhoto slug={sector.slug} alt="" className="h-36 w-full object-cover sm:h-40" />
-                                </span>
-                                <span className="flex flex-1 flex-col p-4 sm:p-5">
-                                    <span className="text-lg font-medium">{sector.name}</span>
-                                    <span className="mt-2 line-clamp-4 text-sm leading-6 text-[#D5E6E1]">
+                                <div className={flipped ? 'lg:order-2' : undefined}>
+                                    <FieldPhoto
+                                        slug={sector.slug}
+                                        alt=""
+                                        className="aspect-video w-full rounded-2xl object-cover lg:aspect-[5/4]"
+                                    />
+                                </div>
+                                <div className={flipped ? 'lg:order-1' : undefined}>
+                                    <p className="text-[0.9375rem] font-semibold text-sea">
+                                        {String(index + 1).padStart(2, '0')}
+                                    </p>
+                                    <h2 id={`sector-${sector.slug}`} className="mt-3 max-w-xl text-3xl font-medium text-balance text-deep sm:text-4xl">
+                                        {sector.name}
+                                    </h2>
+                                    <p className="mt-6 max-w-prose text-base leading-7 text-[#3E534C]">
                                         {sector.body || sector.summary}
-                                    </span>
-                                </span>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </PageBody>
+                                    </p>
+                                    <Link
+                                        href={`/${locale}/sectors/${sector.slug}`}
+                                        className="mt-8 inline-flex min-h-11 items-center text-sm font-medium text-sea underline-offset-4 hover:underline"
+                                    >
+                                        {t('sectorDetails')}
+                                    </Link>
+                                </div>
+                            </div>
+                        </section>
+                    );
+                })
+            )}
         </>
     );
 }
