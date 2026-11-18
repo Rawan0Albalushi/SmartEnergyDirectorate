@@ -1,0 +1,52 @@
+import { Link } from '@inertiajs/react';
+import { fieldPlate, horizon } from '@/lib/fields';
+import { formatDate } from '@/lib/format';
+import { useI18n } from '@/lib/i18n';
+import type { NewsSummary } from '@/types/content';
+
+export function NewsCover({
+    article,
+    className = '',
+    titleClassName = 'text-xl sm:text-2xl',
+}: {
+    article: NewsSummary;
+    className?: string;
+    titleClassName?: string;
+}) {
+    const { locale } = useI18n();
+
+    return (
+        <Link
+            href={`/${locale}/news/${article.slug}`}
+            className={`group relative block overflow-hidden rounded-2xl bg-deep ${className}`}
+        >
+            <NewsPhoto article={article} />
+            <span
+                className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#061612] via-[#061612]/70 to-transparent transition-[height] duration-300 group-hover:h-[58%]"
+                aria-hidden="true"
+            />
+            <span className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-2 p-4 text-white sm:p-5">
+                <time className="text-sm" dateTime={article.publishedAt ?? undefined}>
+                    {formatDate(article.publishedAt, locale)}
+                </time>
+                <span className={`line-clamp-2 font-medium leading-snug ${titleClassName}`}>{article.title}</span>
+            </span>
+        </Link>
+    );
+}
+
+export function NewsPhoto({ article }: { article: NewsSummary }) {
+    const plate = fieldPlate(article.sector?.slug);
+
+    return (
+        <img
+            src={plate?.src ?? horizon.src}
+            alt=""
+            width={1200}
+            height={900}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+        />
+    );
+}

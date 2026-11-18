@@ -1,7 +1,8 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Globe, LayoutGrid, MapPin } from 'lucide-react';
-import { EntryLink, ScopeBadge, Thumb } from '@/components/public/entry';
-import { FilterPill, PageBody, Sheet } from '@/components/public/frame';
+import { ScopeBadge } from '@/components/public/entry';
+import { FilterPill, PageBody, SectionTitle } from '@/components/public/frame';
+import { NewsCover, NewsPhoto } from '@/components/public/news-cover';
 import { PageIntro } from '@/components/public/page-intro';
 import { Pager } from '@/components/public/pager';
 import { formatDate } from '@/lib/format';
@@ -18,6 +19,8 @@ export default function NewsIndex({
     activeScope: string | null;
 }) {
     const { t, locale } = useI18n();
+    const featured = page.current === 1 ? articles.slice(0, 3) : [];
+    const [lead, ...sides] = featured;
 
     return (
         <>
@@ -38,28 +41,60 @@ export default function NewsIndex({
                         {t('international')}
                     </FilterPill>
                 </nav>
-                <Sheet className="mt-4">
-                    {articles.length === 0 ? <p className="px-4 py-6 text-sm text-[#3E534C] sm:px-5">{t('emptyNews')}</p> : null}
-                    <ul>
-                        {articles.map((article) => (
-                            <li key={article.slug} className="border-b border-line last:border-b-0">
-                                <EntryLink href={`/${locale}/news/${article.slug}`}>
-                                    <Thumb slug={article.sector?.slug} />
-                                    <span className="min-w-0 flex-1">
-                                        <span className="flex flex-wrap items-center gap-2">
-                                            <time className="text-xs text-[#3E534C]" dateTime={article.publishedAt ?? undefined}>
-                                                {formatDate(article.publishedAt, locale)}
-                                            </time>
-                                            <ScopeBadge>{label(locale, article.scope)}</ScopeBadge>
+
+                {articles.length === 0 ? <p className="mt-8 text-sm text-[#3E534C]">{t('emptyNews')}</p> : null}
+
+                {lead ? (
+                    <div className={`mt-8 grid gap-4 ${sides.length > 0 ? 'lg:grid-cols-3' : ''}`}>
+                        <NewsCover
+                            article={lead}
+                            titleClassName="text-2xl sm:text-[1.7rem]"
+                            className={sides.length > 0 ? 'min-h-[22rem] lg:col-span-2 lg:min-h-[32rem]' : 'min-h-[22rem] lg:min-h-[28rem]'}
+                        />
+                        {sides.length > 0 ? (
+                            <div
+                                className={`grid h-full gap-4 ${sides.length > 1 ? 'sm:grid-cols-2 lg:grid-cols-1 lg:grid-rows-2' : ''}`}
+                            >
+                                {sides.map((article) => (
+                                    <NewsCover key={article.slug} article={article} className="h-full min-h-56" />
+                                ))}
+                            </div>
+                        ) : null}
+                    </div>
+                ) : null}
+
+                {articles.length > 0 ? (
+                    <section className="mt-14" aria-labelledby="latest-news">
+                        <SectionTitle id="latest-news">{t('latestNews')}</SectionTitle>
+                        <ul className="mt-6 grid gap-8">
+                            {articles.map((article) => (
+                                <li key={article.slug}>
+                                    <Link
+                                        href={`/${locale}/news/${article.slug}`}
+                                        className="group grid gap-4 sm:grid-cols-[minmax(0,17.5rem)_minmax(0,1fr)] sm:items-center sm:gap-6"
+                                    >
+                                        <span className="relative block h-52 overflow-hidden rounded-2xl bg-[#e7eeea] sm:h-44">
+                                            <NewsPhoto article={article} />
                                         </span>
-                                        <span className="mt-1 block text-base font-medium leading-6 text-ink">{article.title}</span>
-                                        <span className="mt-1 line-clamp-2 text-sm leading-6 text-[#3E534C]">{article.summary}</span>
-                                    </span>
-                                </EntryLink>
-                            </li>
-                        ))}
-                    </ul>
-                </Sheet>
+                                        <span className="min-w-0">
+                                            <span className="flex flex-wrap items-center gap-2">
+                                                <time className="text-sm text-[#3E534C]" dateTime={article.publishedAt ?? undefined}>
+                                                    {formatDate(article.publishedAt, locale)}
+                                                </time>
+                                                <ScopeBadge>{label(locale, article.scope)}</ScopeBadge>
+                                            </span>
+                                            <span className="mt-2 block text-xl font-medium leading-8 text-ink group-hover:text-sea">
+                                                {article.title}
+                                            </span>
+                                            <span className="mt-2 line-clamp-2 text-sm leading-7 text-[#3E534C]">{article.summary}</span>
+                                        </span>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                ) : null}
+
                 <Pager page={page} />
             </PageBody>
         </>

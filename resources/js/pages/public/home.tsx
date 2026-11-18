@@ -3,6 +3,7 @@ import { FieldPhoto } from '@/components/public/field-photo';
 import { HomeAchievements } from '@/components/public/home-achievements';
 import { HomeDepartments, HomeIndicators } from '@/components/public/home-catalog';
 import { HomeDigest } from '@/components/public/home-digest';
+import { HomeProjects } from '@/components/public/home-projects';
 import { PortraitCard } from '@/components/public/portrait-card';
 import { fieldPlate, horizon } from '@/lib/fields';
 import { useI18n } from '@/lib/i18n';
@@ -13,6 +14,7 @@ export default function Home({
     indicators,
     news,
     projects,
+    projectTotal,
     achievements,
     departments,
 }: {
@@ -20,6 +22,7 @@ export default function Home({
     indicators: IndicatorReading[];
     news: NewsSummary[];
     projects: ProjectSummary[];
+    projectTotal: number;
     achievements: AchievementItem[];
     departments: DepartmentSummary[];
 }) {
@@ -62,7 +65,9 @@ export default function Home({
 
             <HomeIndicators sectors={sectors} indicators={indicators} />
 
-            <HomeDigest news={news} projects={projects} />
+            <HomeProjects projects={projects} sectors={sectors} total={projectTotal} />
+
+            <HomeDigest news={news} />
 
             <HomeAchievements achievements={achievements} />
 

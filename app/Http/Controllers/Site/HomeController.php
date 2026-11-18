@@ -35,7 +35,7 @@ class HomeController extends Controller
                 ->with('sector')
                 ->orderByDesc('published_at')
                 ->orderByDesc('id')
-                ->limit(5)
+                ->limit(9)
                 ->get()
                 ->map(fn (NewsArticle $article): array => $article->toSummaryArray())
                 ->values(),
@@ -44,10 +44,11 @@ class HomeController extends Controller
                 ->with('sector')
                 ->orderByDesc('year')
                 ->orderByDesc('id')
-                ->limit(4)
+                ->limit(8)
                 ->get()
                 ->map(fn (Project $project): array => $project->toSummaryArray())
                 ->values(),
+            'projectTotal' => Project::query()->published()->count(),
             'achievements' => Achievement::query()
                 ->published()
                 ->with('sector')

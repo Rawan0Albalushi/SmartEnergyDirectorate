@@ -6,6 +6,28 @@ export function formatNumber(value: number, locale: Locale): string {
     }).format(value);
 }
 
+export function formatProjectCount(count: number, locale: Locale): string {
+    const amount = formatNumber(count, locale);
+
+    if (locale === 'ar') {
+        if (count === 1) {
+            return 'مشروع واحد';
+        }
+
+        if (count === 2) {
+            return 'مشروعان';
+        }
+
+        if (count >= 3 && count <= 10) {
+            return `${amount} مشاريع`;
+        }
+
+        return `${amount} مشروعًا`;
+    }
+
+    return count === 1 ? '1 project' : `${amount} projects`;
+}
+
 export function formatDate(value: string | null, locale: Locale): string {
     if (!value) {
         return '';
