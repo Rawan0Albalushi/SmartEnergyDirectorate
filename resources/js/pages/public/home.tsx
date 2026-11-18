@@ -67,9 +67,9 @@ export default function Home({
 
             <HomeProjects projects={projects} sectors={sectors} total={projectTotal} />
 
-            <HomeDigest news={news} />
-
             <HomeAchievements achievements={achievements} />
+
+            <HomeDigest news={news} />
 
             <HomeDepartments departments={departments} />
         </>

@@ -486,6 +486,188 @@ html[dir='rtl'] .field-sun {
     }
 }
 
+.chronicle {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+}
+
+.chronicle-rail {
+    position: absolute;
+    z-index: 0;
+    inset-inline-start: 0.4375rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #d5ded8;
+    pointer-events: none;
+}
+
+.chronicle-rail__draw {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #0c2e2a;
+    clip-path: inset(0);
+}
+
+.chronicle-year {
+    position: relative;
+    z-index: 1;
+}
+
+.chronicle-year__label {
+    margin: 0 0 1rem;
+    font-size: 2.25rem;
+    font-weight: 500;
+    line-height: 1;
+    color: #0c2e2a;
+    font-variant-numeric: tabular-nums;
+}
+
+.chronicle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.chronicle-side {
+    margin-bottom: 1.25rem;
+    padding-inline-start: 1.75rem;
+}
+
+.chronicle-photo {
+    position: relative;
+    display: block;
+    height: 11rem;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: #e7eeea;
+}
+
+.chronicle-copy {
+    position: relative;
+    min-width: 0;
+    padding-inline-start: 1.75rem;
+}
+
+.chronicle-node {
+    position: absolute;
+    z-index: 1;
+    top: 0.4rem;
+    inset-inline-start: -1.75rem;
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2px solid #0c2e2a;
+    border-radius: 999px;
+    background: #f6e2b8;
+    pointer-events: none;
+}
+
+.chronicle-node::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    inset-inline-start: 100%;
+    width: 0.7rem;
+    height: 1px;
+    background: #0c2e2a;
+    opacity: 0.35;
+}
+
+.chronicle-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 2.25rem;
+    color: #122433;
+    text-wrap: balance;
+}
+
+.chronicle-summary {
+    max-width: 36rem;
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.75rem;
+    color: #3e534c;
+}
+
+.chronicle-sector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: #0e6b62;
+}
+
+@media (min-width: 64rem) {
+    .chronicle-entry {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        column-gap: 3rem;
+        align-items: start;
+    }
+
+    .chronicle-year__label {
+        position: sticky;
+        top: 7rem;
+        margin: 0 0 1rem;
+        font-size: 3rem;
+        text-align: end;
+    }
+
+    .chronicle-side {
+        margin: 0;
+        padding: 0;
+    }
+
+    .chronicle-photo {
+        width: min(100%, 22rem);
+        height: 12rem;
+        margin-inline-start: auto;
+    }
+
+    .chronicle-copy {
+        padding-inline-start: 0;
+    }
+
+    .chronicle-rail {
+        inset-inline-start: 50%;
+        margin-inline-start: -1px;
+    }
+
+    .chronicle-node {
+        top: 0.7rem;
+        inset-inline-start: calc(-1.5rem - 0.4375rem);
+    }
+
+    .chronicle-node::after {
+        width: 0.95rem;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .chronicle-rail__draw {
+        animation: chronicle-draw 1.15s cubic-bezier(0.22, 0.7, 0.2, 1) both;
+    }
+}
+
+@keyframes chronicle-draw {
+    from {
+        clip-path: inset(0 0 100% 0);
+    }
+
+    to {
+        clip-path: inset(0);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     html:focus-within {
         scroll-behavior: auto;

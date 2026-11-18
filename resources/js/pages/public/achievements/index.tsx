@@ -1,19 +1,12 @@
 import { Head } from '@inertiajs/react';
-import { Award, Building2, Calendar, Droplets, Sun, Zap, type LucideIcon } from 'lucide-react';
-import { FieldPhoto } from '@/components/public/field-photo';
+import { useLayoutEffect, useRef } from 'react';
+import { SectorGlyph } from '@/components/public/entry';
 import { PageBody } from '@/components/public/frame';
 import { PageIntro } from '@/components/public/page-intro';
 import { Pager } from '@/components/public/pager';
-import { horizon } from '@/lib/fields';
+import { fieldPlate, horizon } from '@/lib/fields';
 import { useI18n } from '@/lib/i18n';
-import type { AchievementItem, PageMeta, SectorLink } from '@/types/content';
-
-const sectorIcons: Record<string, LucideIcon> = {
-    renewable: Sun,
-    hydrogen: Droplets,
-    electricity: Zap,
-    efficiency: Building2,
-};
+import type { AchievementItem, PageMeta } from '@/types/content';
 
 export default function AchievementsIndex({
     achievements,
@@ -23,6 +16,61 @@ export default function AchievementsIndex({
     page: PageMeta;
 }) {
     const { t } = useI18n();
+    const years = groupByYear(achievements);
+    const chronicleRef = useRef<HTMLDivElement>(null);
+
+    useLayoutEffect(() => {
+        const root = chronicleRef.current;
+
+        if (!root) {
+            return;
+        }
+
+        const rail = root.querySelector<HTMLElement>('.chronicle-rail');
+
+        const fit = () => {
+            if (!rail) {
+                return;
+            }
+
+            const nodes = root.querySelectorAll<HTMLElement>('.chronicle-node');
+            const first = nodes[0];
+            const last = nodes[nodes.length - 1];
+
+            if (!first || !last) {
+                return;
+            }
+
+            const rootBox = root.getBoundingClientRect();
+            const firstBox = first.getBoundingClientRect();
+            const lastBox = last.getBoundingClientRect();
+            const start = firstBox.top + firstBox.height / 2 - rootBox.top;
+            const end = lastBox.top + lastBox.height / 2 - rootBox.top;
+
+            rail.style.top = `${start}px`;
+            rail.style.height = `${Math.max(end - start, 0)}px`;
+            rail.style.bottom = 'auto';
+        };
+
+        fit();
+
+        const draw = rail.querySelector<HTMLElement>('.chronicle-rail__draw');
+
+        if (draw) {
+            draw.style.animation = 'none';
+            void draw.offsetWidth;
+            draw.style.animation = '';
+        }
+
+        const observer = new ResizeObserver(fit);
+        observer.observe(root);
+        window.addEventListener('resize', fit);
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('resize', fit);
+        };
+    }, [achievements]);
 
     return (
         <>
@@ -30,44 +78,82 @@ export default function AchievementsIndex({
             <PageIntro title={t('achievements')} lede={t('achievementsIntro')} />
             <PageBody>
                 {achievements.length === 0 ? <p className="text-sm text-[#3E534C]">{t('emptyAchievements')}</p> : null}
-                <ul className="grid gap-3">
-                    {achievements.map((item) => (
-                        <li
-                            key={item.id}
-                            className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-3 shadow-[0_16px_40px_-24px_rgba(12,46,42,0.45)] sm:flex-row sm:items-center sm:gap-4 sm:p-4"
-                        >
-                            <span className="block h-36 w-full shrink-0 overflow-hidden rounded-xl bg-[#e7eeea] sm:h-28 sm:w-40">
-                                {item.sector ? (
-                                    <FieldPhoto slug={item.sector.slug} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                    <img src={horizon.src} alt="" className="h-full w-full object-cover" />
-                                )}
-                            </span>
-                            <span className="min-w-0 flex-1">
-                                <span className="inline-flex items-center gap-1.5 text-sm text-[#3E534C]">
-                                    <Calendar className="size-4" aria-hidden="true" />
-                                    {item.year}
-                                </span>
-                                <span className="mt-1 block text-lg font-medium leading-7 text-ink">{item.title}</span>
-                                <span className="mt-1 text-sm leading-6 text-[#3E534C]">{item.summary}</span>
-                            </span>
-                            {item.sector ? <SectorMark sector={item.sector} /> : null}
-                        </li>
-                    ))}
-                </ul>
+
+                {years.length > 0 ? (
+                    <div className="chronicle" ref={chronicleRef}>
+                        <div className="chronicle-rail" aria-hidden="true">
+                            <span className="chronicle-rail__draw" />
+                        </div>
+                        {years.map((group) => (
+                            <section key={group.year} className="chronicle-year" aria-labelledby={`achievements-${group.year}`}>
+                                <ol className="chronicle-list">
+                                    {group.items.map((item, index) => (
+                                        <li key={item.id}>
+                                            <article className="chronicle-entry">
+                                                <div className="chronicle-side">
+                                                    {index === 0 ? (
+                                                        <h2 id={`achievements-${group.year}`} className="chronicle-year__label">
+                                                            <time dateTime={String(group.year)}>{group.year}</time>
+                                                        </h2>
+                                                    ) : null}
+                                                    <span className="chronicle-photo">
+                                                        <AchievementPhoto item={item} />
+                                                    </span>
+                                                </div>
+                                                <div className="chronicle-copy">
+                                                    <span className="chronicle-node" aria-hidden="true" />
+                                                    <h3 className="chronicle-title">{item.title}</h3>
+                                                    <p className="chronicle-summary">{item.summary}</p>
+                                                    {item.sector ? (
+                                                        <p className="chronicle-sector">
+                                                            <SectorGlyph slug={item.sector.slug} className="size-4" />
+                                                            {item.sector.name}
+                                                        </p>
+                                                    ) : null}
+                                                </div>
+                                            </article>
+                                        </li>
+                                    ))}
+                                </ol>
+                            </section>
+                        ))}
+                    </div>
+                ) : null}
+
                 <Pager page={page} />
             </PageBody>
         </>
     );
 }
 
-function SectorMark({ sector }: { sector: SectorLink }) {
-    const Icon = sectorIcons[sector.slug] ?? Award;
+function groupByYear(achievements: AchievementItem[]) {
+    const groups: { year: number; items: AchievementItem[] }[] = [];
+
+    for (const item of achievements) {
+        const current = groups[groups.length - 1];
+
+        if (current?.year === item.year) {
+            current.items.push(item);
+        } else {
+            groups.push({ year: item.year, items: [item] });
+        }
+    }
+
+    return groups;
+}
+
+function AchievementPhoto({ item }: { item: AchievementItem }) {
+    const plate = fieldPlate(item.sector?.slug);
 
     return (
-        <span className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-[#e7f1ee] px-3 py-2 text-xs leading-5 text-deep sm:max-w-36 sm:flex-col sm:rounded-2xl sm:px-3 sm:py-3 sm:text-center">
-            <Icon className="size-4" aria-hidden="true" />
-            {sector.name}
-        </span>
+        <img
+            src={plate?.src ?? horizon.src}
+            alt=""
+            width={1200}
+            height={900}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+        />
     );
 }
