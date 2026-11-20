@@ -7,6 +7,7 @@ import {
     SelectField,
     TextField,
 } from '@/components/admin/fields';
+import { ImageField } from '@/components/admin/image-field';
 import { useI18n } from '@/lib/i18n';
 import type { Option } from '@/types/content';
 
@@ -18,6 +19,7 @@ type AchievementFormData = {
     summary_en: string;
     year: number;
     is_published: boolean;
+    image_url?: string | null;
 };
 
 export default function AchievementForm({
@@ -46,14 +48,23 @@ export default function AchievementForm({
                 ? '1'
                 : '0'
             : '1',
+        image: null as File | null,
+        remove_image: false,
     });
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        form.transform((data) => ({
+            ...data,
+            image: data.image ?? '',
+            remove_image: data.remove_image ? '1' : '0',
+        }));
+        const options = { forceFormData: true };
+
         if (method === 'post') {
-            form.post(submitUrl);
+            form.post(submitUrl, options);
         } else {
-            form.put(submitUrl);
+            form.put(submitUrl, options);
         }
     }
 
@@ -140,6 +151,21 @@ export default function AchievementForm({
                         ]}
                     />
                 </FieldPair>
+                <ImageField
+                    label={t('photo')}
+                    hint={t('imageHint')}
+                    currentUrl={achievement?.image_url}
+                    remove={form.data.remove_image}
+                    error={form.errors.image}
+                    onFile={(file) =>
+                        form.setData({
+                            ...form.data,
+                            image: file,
+                            remove_image: file ? false : form.data.remove_image,
+                        })
+                    }
+                    onRemove={(remove) => form.setData('remove_image', remove)}
+                />
             </RecordForm>
         </>
     );

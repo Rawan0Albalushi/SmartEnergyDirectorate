@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Http\Requests;
+
+class UpdateSiteMediaRequest extends DirectorateFormRequest
+{
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function rules(): array
+    {
+        return $this->imageRules();
+    }
+}

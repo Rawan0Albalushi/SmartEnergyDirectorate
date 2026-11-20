@@ -17,6 +17,7 @@ class UpdateSectorRequest extends DirectorateFormRequest
             'body_ar' => ['nullable', 'string', 'max:5000'],
             'body_en' => ['nullable', 'string', 'max:5000'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
+            ...$this->imageRules(),
         ];
     }
 }

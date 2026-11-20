@@ -25,6 +25,7 @@ class SaveProjectRequest extends DirectorateFormRequest
             'location_en' => ['nullable', 'string', 'max:255'],
             'year' => ['required', 'integer', 'min:1990', 'max:2100'],
             'is_published' => ['required', 'boolean'],
+            ...$this->imageRules(),
         ];
     }
 }

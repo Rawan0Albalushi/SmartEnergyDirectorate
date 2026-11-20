@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasLocalizedText;
+use App\Models\Concerns\HasStoredImage;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $body_ar
  * @property string|null $body_en
  * @property int $sort_order
+ * @property string|null $image_path
  */
 #[Fillable([
     'slug',
@@ -31,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Sector extends Model
 {
     use HasLocalizedText;
+    use HasStoredImage;
 
     public function getRouteKeyName(): string
     {
@@ -54,7 +57,7 @@ class Sector extends Model
     }
 
     /**
-     * @return array{slug: string, name: string, summary: string}
+     * @return array{slug: string, name: string, summary: string, imageUrl: ?string}
      */
     public function toSummaryArray(): array
     {
@@ -62,11 +65,12 @@ class Sector extends Model
             'slug' => $this->slug,
             'name' => $this->localized('name'),
             'summary' => $this->localized('summary'),
+            'imageUrl' => $this->storedImageUrl(),
         ];
     }
 
     /**
-     * @return array{slug: string, name: string, summary: string, body: string}
+     * @return array{slug: string, name: string, summary: string, imageUrl: ?string, body: string}
      */
     public function toDetailArray(): array
     {

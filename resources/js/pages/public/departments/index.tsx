@@ -4,7 +4,7 @@ import { PageIntro } from '@/components/public/page-intro';
 import { PersonGallery } from '@/components/public/person-gallery';
 import { PortraitCard } from '@/components/public/portrait-card';
 import { departmentPlates } from '@/lib/department-plates';
-import { horizon } from '@/lib/fields';
+import { useHeroSrc } from '@/lib/media';
 import { useI18n, type TranslationKey } from '@/lib/i18n';
 import type { DepartmentSummary, StaffPublic } from '@/types/content';
 
@@ -29,6 +29,7 @@ export default function DepartmentsIndex({
     people: StaffPublic[];
 }) {
     const { t, locale } = useI18n();
+    const hero = useHeroSrc();
     const view = roster === 'staff' || roster === 'board' ? roster : 'sections';
     const copy = views[view];
 
@@ -69,12 +70,15 @@ export default function DepartmentsIndex({
                     ) : (
                         <ol className="mt-6 grid list-none gap-5 p-0 sm:grid-cols-2 xl:grid-cols-3">
                             {departments.map((department, index) => {
-                                const plate = departmentPlates[
-                                    department.slug
-                                ] ?? {
-                                    src: horizon.src,
-                                    position: 'object-center',
-                                };
+                                const plate = department.imageUrl
+                                    ? {
+                                          src: department.imageUrl,
+                                          position: 'object-center',
+                                      }
+                                    : (departmentPlates[department.slug] ?? {
+                                          src: hero,
+                                          position: 'object-center',
+                                      });
 
                                 return (
                                     <li

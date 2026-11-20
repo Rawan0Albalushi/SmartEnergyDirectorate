@@ -36,6 +36,9 @@ class SectorController extends Controller
                         ->map(fn (Indicator $indicator): array => $indicator->toPublicArray())
                         ->values(),
                     'projects' => $sector->projects
+                        ->each(function (Project $project) use ($sector): void {
+                            $project->setRelation('sector', $sector);
+                        })
                         ->map(fn (Project $project): array => $project->toSummaryArray())
                         ->values(),
                 ])

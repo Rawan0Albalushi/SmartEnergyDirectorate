@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasLocalizedText;
+use App\Models\Concerns\HasStoredImage;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $phone
  * @property int $sort_order
  * @property int $staff_members_count
+ * @property string|null $image_path
  */
 #[Fillable([
     'slug',
@@ -36,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Department extends Model
 {
     use HasLocalizedText;
+    use HasStoredImage;
 
     public function getRouteKeyName(): string
     {
@@ -51,7 +54,7 @@ class Department extends Model
     }
 
     /**
-     * @return array{slug: string, name: string, summary: string, email: ?string, phone: ?string}
+     * @return array{slug: string, name: string, summary: string, email: ?string, phone: ?string, imageUrl: ?string}
      */
     public function toSummaryArray(): array
     {
@@ -61,11 +64,12 @@ class Department extends Model
             'summary' => $this->localized('summary'),
             'email' => $this->email,
             'phone' => $this->phone,
+            'imageUrl' => $this->storedImageUrl(),
         ];
     }
 
     /**
-     * @return array{slug: string, name: string, summary: string, email: ?string, phone: ?string, mandate: string}
+     * @return array{slug: string, name: string, summary: string, email: ?string, phone: ?string, imageUrl: ?string, mandate: string}
      */
     public function toDetailArray(): array
     {

@@ -116,7 +116,13 @@ const ar = {
     scope: 'النطاق',
     status: 'الحالة',
     actions: 'إجراءات',
+    title: 'العنوان',
+    name: 'الاسم',
+    summary: 'الملخص',
+    jobTitle: 'المسمى',
+    origin: 'الإدخال',
     open: 'فتح',
+    view: 'عرض',
     sector: 'القطاع',
     recordedOn: 'تاريخ القراءة',
     sortOrder: 'الترتيب',
@@ -177,6 +183,13 @@ const ar = {
     fieldHydrogen: 'خزانات منشأة هيدروجين',
     fieldElectricity: 'محطة تحويل وأبراج نقل',
     fieldEfficiency: 'مبنى عام بتظليل ونوافذ مضاءة',
+    siteImages: 'صور الموقع',
+    siteImagesHint:
+        'صورة الواجهة تُغيّر من هنا. صور القطاعات والأقسام والمشاريع والأخبار والإنجازات والموظفين تُغيّر من صفحة كل سجل.',
+    heroImage: 'صورة الواجهة',
+    heroImageHint:
+        'تظهر في أعلى الصفحة الرئيسية، وفي الخلفيات العريضة عندما لا توجد صورة خاصة.',
+    imageHint: 'تظهر مكان الصورة الحالية. اترك الحقل فارغاً للإبقاء عليها.',
 } as const;
 
 const en: { [K in keyof typeof ar]: string } = {
@@ -295,7 +308,13 @@ const en: { [K in keyof typeof ar]: string } = {
     scope: 'Scope',
     status: 'Status',
     actions: 'Actions',
+    title: 'Title',
+    name: 'Name',
+    summary: 'Summary',
+    jobTitle: 'Job title',
+    origin: 'Entry',
     open: 'Open',
+    view: 'View',
     sector: 'Sector',
     recordedOn: 'Reading date',
     sortOrder: 'Sort order',
@@ -359,6 +378,14 @@ const en: { [K in keyof typeof ar]: string } = {
     fieldHydrogen: 'Tanks at a hydrogen facility',
     fieldElectricity: 'A substation and transmission towers',
     fieldEfficiency: 'A public building with sunshades and lit windows',
+    siteImages: 'Site images',
+    siteImagesHint:
+        'Change the homepage photograph here. Sector, department, project, news, achievement, and staff photographs are changed on each record.',
+    heroImage: 'Homepage image',
+    heroImageHint:
+        'Shown at the top of the homepage, and on wide backgrounds when a section has no photo of its own.',
+    imageHint:
+        'Replaces the photo on the site. Leave this empty to keep the current one.',
 };
 
 export type Locale = 'ar' | 'en';

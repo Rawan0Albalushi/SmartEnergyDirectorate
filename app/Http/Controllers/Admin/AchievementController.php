@@ -7,6 +7,8 @@ use App\Http\Requests\SaveAchievementRequest;
 use App\Models\Achievement;
 use App\Support\CatalogOptions;
 use App\Support\PageMeta;
+use App\Support\RecordDetails;
+use App\Support\StoredImage;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -25,9 +27,15 @@ class AchievementController extends Controller
             'achievements' => $achievements->getCollection()->map(fn (Achievement $achievement): array => [
                 'id' => $achievement->id,
                 'title' => $achievement->localized('title'),
+                'imageUrl' => StoredImage::url($achievement->image_path),
+                'sectorSlug' => $achievement->sector?->slug,
                 'year' => $achievement->year,
                 'isPublished' => $achievement->is_published,
                 'sector' => $achievement->sector?->localized('name') ?? '',
+                'showUrl' => route('admin.achievements.show', [
+                    'locale' => app()->getLocale(),
+                    'achievement' => $achievement,
+                ]),
                 'editUrl' => route('admin.achievements.edit', [
                     'locale' => app()->getLocale(),
                     'achievement' => $achievement,
@@ -58,6 +66,27 @@ class AchievementController extends Controller
             ->with('status', __('Saved.'));
     }
 
+    public function show(string $locale, Achievement $achievement): Response
+    {
+        $achievement->load('sector');
+
+        return Inertia::render('admin/details', RecordDetails::make(
+            $achievement->localized('title'),
+            route('admin.achievements.index', ['locale' => app()->getLocale()]),
+            route('admin.achievements.edit', ['locale' => app()->getLocale(), 'achievement' => $achievement]),
+            [
+                RecordDetails::text('sector', $achievement->sector?->localized('name')),
+                RecordDetails::text('titleAr', $achievement->title_ar),
+                RecordDetails::text('titleEn', $achievement->title_en),
+                RecordDetails::text('summaryAr', $achievement->summary_ar),
+                RecordDetails::text('summaryEn', $achievement->summary_en),
+                RecordDetails::text('year', $achievement->year),
+                RecordDetails::image('photo', StoredImage::url($achievement->image_path)),
+                RecordDetails::flag('visibility', $achievement->is_published, 'visibility'),
+            ],
+        ));
+    }
+
     public function edit(string $locale, Achievement $achievement, CatalogOptions $catalog): Response
     {
         return Inertia::render('admin/achievements/form', [
@@ -69,6 +98,7 @@ class AchievementController extends Controller
                 'summary_en' => $achievement->summary_en,
                 'year' => $achievement->year,
                 'is_published' => $achievement->is_published,
+                'image_url' => StoredImage::url($achievement->image_path),
             ],
             'sectors' => $catalog->sectors(),
             'submitUrl' => route('admin.achievements.update', [
@@ -113,5 +143,11 @@ class AchievementController extends Controller
             'year',
             'is_published',
         ]));
+        $achievement->image_path = StoredImage::replace(
+            $achievement->image_path,
+            $request->file('image'),
+            $request->boolean('remove_image'),
+            'achievements',
+        );
     }
 }

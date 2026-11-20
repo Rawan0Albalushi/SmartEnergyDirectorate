@@ -6,7 +6,8 @@ import { HomeDigest } from '@/components/public/home-digest';
 import { HomeProjects } from '@/components/public/home-projects';
 import { PortraitCard } from '@/components/public/portrait-card';
 import { SectionHeading } from '@/components/public/section-heading';
-import { fieldPlate, horizon } from '@/lib/fields';
+import { fieldPlate } from '@/lib/fields';
+import { useHeroSrc } from '@/lib/media';
 import { useI18n } from '@/lib/i18n';
 import type {
     AchievementItem,
@@ -32,6 +33,7 @@ export default function Home({
     achievements: AchievementItem[];
 }) {
     const { t, locale } = useI18n();
+    const hero = useHeroSrc();
 
     return (
         <>
@@ -70,8 +72,9 @@ export default function Home({
                                 <PortraitCard
                                     href={`/${locale}/sectors#${sector.slug}`}
                                     src={
-                                        fieldPlate(sector.slug)?.src ??
-                                        horizon.src
+                                        sector.imageUrl ||
+                                        fieldPlate(sector.slug)?.src ||
+                                        hero
                                     }
                                     index={index}
                                     title={sector.name}

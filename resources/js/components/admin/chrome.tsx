@@ -1,11 +1,14 @@
 import { Link, useForm } from '@inertiajs/react';
+import { Check, Eye, Pencil, X } from 'lucide-react';
 import type { ReactNode } from 'react';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export const primaryButtonClass =
     'inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[6px] bg-deep px-4 text-sm font-medium text-white transition-colors duration-150 hover:bg-[#164840] disabled:cursor-not-allowed disabled:opacity-60';
-
-export const quietButtonClass =
-    'inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[6px] border border-line bg-white px-3 text-sm text-ink transition-colors duration-150 hover:bg-[#f4f7f5] disabled:cursor-not-allowed disabled:opacity-60';
 
 export function StatCards({
     items,
@@ -27,7 +30,7 @@ export function StatCards({
                         href={item.href}
                         className={
                             item.attention
-                                ? 'flex h-full flex-col rounded-[8px] border border-line border-s-[3px] border-s-filament bg-white px-4 py-4 transition-colors duration-150 hover:bg-[#fdf8f4]'
+                                ? 'flex h-full flex-col rounded-[8px] border border-s-[3px] border-line border-s-filament bg-white px-4 py-4 transition-colors duration-150 hover:bg-[#fdf8f4]'
                                 : 'flex h-full flex-col rounded-[8px] border border-line bg-white px-4 py-4 transition-colors duration-150 hover:border-[#b7d4cc] hover:bg-[#f6faf8]'
                         }
                     >
@@ -101,11 +104,15 @@ export function PrimaryLink({
     );
 }
 
-export function RecordList({
+export function DataTable({
+    label,
+    columns,
     count,
     empty,
     children,
 }: {
+    label: string;
+    columns: Array<{ key: string; label: string; align?: 'start' | 'end' }>;
     count: number;
     empty: string;
     children: ReactNode;
@@ -119,70 +126,228 @@ export function RecordList({
     }
 
     return (
-        <ul className="mt-6 overflow-hidden rounded-[8px] border border-line bg-white">
-            {children}
-        </ul>
+        <div className="mt-6 overflow-x-auto rounded-[8px] border border-line bg-white">
+            <table className="w-full min-w-[48rem] border-collapse text-sm">
+                <caption className="sr-only">{label}</caption>
+                <thead>
+                    <tr className="border-b border-line bg-[#f6faf8] text-[#3e534c]">
+                        {columns.map((column) => (
+                            <th
+                                key={column.key}
+                                scope="col"
+                                className={
+                                    column.align === 'end'
+                                        ? 'px-3 py-3 text-end text-sm font-medium whitespace-nowrap'
+                                        : 'px-4 py-3 text-start text-sm font-medium whitespace-nowrap'
+                                }
+                            >
+                                {column.label}
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>{children}</tbody>
+            </table>
+        </div>
     );
 }
 
-export function RecordRow({ children }: { children: ReactNode }) {
+export function DataRow({ children }: { children: ReactNode }) {
     return (
-        <li className="flex flex-col gap-3 border-b border-line px-4 py-4 transition-colors duration-150 last:border-b-0 hover:bg-[#f6faf8] sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <tr className="group border-b border-line transition-colors duration-150 last:border-b-0 hover:bg-[#f6faf8]">
             {children}
-        </li>
+        </tr>
     );
 }
 
-export function Meta({
-    parts,
-}: {
-    parts: Array<string | null | undefined | false>;
-}) {
-    const items = parts.filter((part): part is string => Boolean(part));
-
+export function PhotoCell({ src }: { src: string | null }) {
     return (
-        <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm leading-6 text-[#3e534c]">
-            {items.map((item, index) => (
-                <span key={`${item}-${index}`}>{item}</span>
-            ))}
-        </p>
+        <td className="w-20 px-4 py-2 align-middle">
+            {src ? (
+                <img
+                    src={src}
+                    alt=""
+                    className="h-12 w-16 rounded-[6px] object-cover"
+                />
+            ) : (
+                <span
+                    className="block h-12 w-16 rounded-[6px] bg-[#f6faf8]"
+                    aria-hidden="true"
+                />
+            )}
+        </td>
     );
 }
 
-export function EditLink({
-    href,
+export function DataCell({
     children,
+    primary = false,
+    numeric = false,
+    wrap = false,
 }: {
-    href: string;
-    children: string;
+    children: ReactNode;
+    primary?: boolean;
+    numeric?: boolean;
+    wrap?: boolean;
 }) {
+    const wrapping = primary || wrap;
+
     return (
-        <Link
-            href={href}
-            className="inline-flex min-h-11 shrink-0 items-center text-sm font-medium text-sea underline-offset-4 hover:underline"
+        <td
+            className={
+                primary
+                    ? 'px-4 py-3.5 text-start align-middle text-sm font-medium break-words text-ink'
+                    : numeric
+                      ? 'px-4 py-3.5 text-start align-middle text-sm whitespace-nowrap text-ink tabular-nums'
+                      : wrapping
+                        ? 'px-4 py-3.5 text-start align-middle text-sm break-words text-ink'
+                        : 'px-4 py-3.5 text-start align-middle text-sm whitespace-nowrap text-ink'
+            }
         >
             {children}
-        </Link>
+        </td>
     );
 }
 
-export function Visibility({
-    published,
-    visible,
-    hidden,
+export function ActionCell({ children }: { children: ReactNode }) {
+    return (
+        <td className="px-2 py-1.5 text-end align-middle whitespace-nowrap">
+            <div className="flex items-center justify-end">{children}</div>
+        </td>
+    );
+}
+
+export function StatusText({
+    on,
+    onLabel,
+    offLabel,
 }: {
-    published: boolean;
-    visible: string;
-    hidden: string;
+    on: boolean;
+    onLabel: string;
+    offLabel: string;
 }) {
     return (
         <span
             className={
-                published ? 'text-sm text-sea' : 'text-sm text-[#3e534c]'
+                on
+                    ? 'inline-flex items-center gap-2 whitespace-nowrap text-sea'
+                    : 'inline-flex items-center gap-2 whitespace-nowrap text-[#3e534c]'
             }
         >
-            {published ? visible : hidden}
+            <span
+                className={
+                    on
+                        ? 'size-1.5 shrink-0 rounded-full bg-sea'
+                        : 'size-1.5 shrink-0 rounded-full bg-[#9aaba4]'
+                }
+                aria-hidden="true"
+            />
+            {on ? onLabel : offLabel}
         </span>
+    );
+}
+
+const rowIcons = {
+    view: Eye,
+    edit: Pencil,
+    publish: Check,
+    reject: X,
+} as const;
+
+const defaultActionClass =
+    'inline-flex size-11 cursor-pointer items-center justify-center rounded-[6px] text-sea transition-colors duration-150 hover:bg-[#e7f1ee] disabled:cursor-not-allowed disabled:opacity-60';
+
+const dangerActionClass =
+    'inline-flex size-11 cursor-pointer items-center justify-center rounded-[6px] text-[#9f2c22] transition-colors duration-150 hover:bg-[#fdf6f5] disabled:cursor-not-allowed disabled:opacity-60';
+
+export function RowAction({
+    kind,
+    label,
+    href,
+    method = 'post',
+}: {
+    kind: 'view' | 'edit' | 'publish' | 'reject';
+    label: string;
+    href: string;
+    method?: 'post' | 'delete';
+}) {
+    if (kind === 'view' || kind === 'edit') {
+        return (
+            <ActionTip label={label}>
+                <Link
+                    href={href}
+                    aria-label={label}
+                    className={defaultActionClass}
+                >
+                    <ActionIcon kind={kind} />
+                </Link>
+            </ActionTip>
+        );
+    }
+
+    return (
+        <CommandAction href={href} method={method} label={label} kind={kind} />
+    );
+}
+
+function CommandAction({
+    href,
+    method,
+    label,
+    kind,
+}: {
+    href: string;
+    method: 'post' | 'delete';
+    label: string;
+    kind: 'publish' | 'reject';
+}) {
+    const form = useForm({});
+
+    return (
+        <ActionTip label={label}>
+            <button
+                type="button"
+                aria-label={label}
+                disabled={form.processing}
+                className={
+                    kind === 'reject' ? dangerActionClass : defaultActionClass
+                }
+                onClick={() =>
+                    method === 'post'
+                        ? form.post(href, { preserveScroll: true })
+                        : form.delete(href, { preserveScroll: true })
+                }
+            >
+                <ActionIcon kind={kind} />
+            </button>
+        </ActionTip>
+    );
+}
+
+function ActionTip({
+    label,
+    children,
+}: {
+    label: string;
+    children: ReactNode;
+}) {
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>{children}</TooltipTrigger>
+            <TooltipContent className="text-sm">{label}</TooltipContent>
+        </Tooltip>
+    );
+}
+
+function ActionIcon({
+    kind,
+}: {
+    kind: 'view' | 'edit' | 'publish' | 'reject';
+}) {
+    const Icon = rowIcons[kind];
+
+    return (
+        <Icon className="size-[18px]" strokeWidth={1.75} aria-hidden="true" />
     );
 }
 
@@ -207,38 +372,5 @@ export function FilterLink({
         >
             {children}
         </Link>
-    );
-}
-
-export function CommandButton({
-    href,
-    method,
-    tone = 'quiet',
-    children,
-}: {
-    href: string;
-    method: 'post' | 'delete';
-    tone?: 'quiet' | 'danger';
-    children: string;
-}) {
-    const form = useForm({});
-    const className =
-        tone === 'danger'
-            ? 'inline-flex min-h-11 cursor-pointer items-center rounded-[6px] border border-[#e7c6c2] bg-white px-3 text-sm text-[#9f2c22] transition-colors duration-150 hover:bg-[#fdf6f5] disabled:cursor-not-allowed disabled:opacity-60'
-            : quietButtonClass;
-
-    return (
-        <button
-            type="button"
-            disabled={form.processing}
-            className={className}
-            onClick={() =>
-                method === 'post'
-                    ? form.post(href, { preserveScroll: true })
-                    : form.delete(href, { preserveScroll: true })
-            }
-        >
-            {children}
-        </button>
     );
 }

@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { fieldPlate, horizon } from '@/lib/fields';
+import { fieldPlate } from '@/lib/fields';
+import { useHeroSrc } from '@/lib/media';
 import { formatDate } from '@/lib/format';
 import { useI18n } from '@/lib/i18n';
 import type { NewsSummary } from '@/types/content';
@@ -46,11 +47,12 @@ export function NewsCover({
 }
 
 export function NewsPhoto({ article }: { article: NewsSummary }) {
+    const hero = useHeroSrc();
     const plate = fieldPlate(article.sector?.slug);
 
     return (
         <img
-            src={plate?.src ?? horizon.src}
+            src={article.imageUrl || plate?.src || hero}
             alt=""
             width={1200}
             height={900}

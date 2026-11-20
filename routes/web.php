@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\NewsSourceController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 use App\Http\Controllers\Admin\PublishedNewsController;
 use App\Http\Controllers\Admin\SectorController as AdminSectorController;
+use App\Http\Controllers\Admin\SiteMediaController;
 use App\Http\Controllers\Admin\StaffMemberController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Site\AchievementController;
@@ -60,29 +61,29 @@ Route::prefix('{locale}')
 
         Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
             Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+            Route::get('media', [SiteMediaController::class, 'edit'])->name('media.edit');
+            Route::put('media', [SiteMediaController::class, 'update'])->name('media.update');
 
             Route::get('sectors', [AdminSectorController::class, 'index'])->name('sectors.index');
+            Route::get('sectors/{sector}', [AdminSectorController::class, 'show'])->name('sectors.show');
             Route::get('sectors/{sector}/edit', [AdminSectorController::class, 'edit'])->name('sectors.edit');
             Route::put('sectors/{sector}', [AdminSectorController::class, 'update'])->name('sectors.update');
 
-            Route::resource('indicators', AdminIndicatorController::class)->except(['show']);
-            Route::resource('projects', AdminProjectController::class)->except(['show']);
-            Route::resource('achievements', AdminAchievementController::class)->except(['show']);
+            Route::resource('indicators', AdminIndicatorController::class);
+            Route::resource('projects', AdminProjectController::class);
+            Route::resource('achievements', AdminAchievementController::class);
             Route::resource('news', NewsArticleController::class)
-                ->parameters(['news' => 'newsArticle'])
-                ->except(['show']);
+                ->parameters(['news' => 'newsArticle']);
             Route::post('news/{newsArticle}/publication', [PublishedNewsController::class, 'store'])
                 ->name('news.publication.store');
             Route::delete('news/{newsArticle}/publication', [PublishedNewsController::class, 'destroy'])
                 ->name('news.publication.destroy');
             Route::post('news-fetches', [NewsFetchController::class, 'store'])->name('news-fetches.store');
             Route::resource('sources', NewsSourceController::class)
-                ->parameters(['sources' => 'newsSource'])
-                ->except(['show']);
-            Route::resource('departments', AdminDepartmentController::class)->except(['show']);
+                ->parameters(['sources' => 'newsSource']);
+            Route::resource('departments', AdminDepartmentController::class);
             Route::resource('staff', StaffMemberController::class)
-                ->parameters(['staff' => 'staffMember'])
-                ->except(['show']);
+                ->parameters(['staff' => 'staffMember']);
         });
     });
 

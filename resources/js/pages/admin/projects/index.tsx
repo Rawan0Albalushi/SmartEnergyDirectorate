@@ -1,23 +1,29 @@
 import { Head } from '@inertiajs/react';
 import {
-    EditLink,
-    Meta,
+    ActionCell,
+    DataCell,
+    PhotoCell,
+    DataRow,
+    DataTable,
     PageIntro,
     PrimaryLink,
-    RecordList,
-    RecordRow,
-    Visibility,
+    RowAction,
+    StatusText,
 } from '@/components/admin/chrome';
 import { Pager } from '@/components/public/pager';
 import { label, useI18n } from '@/lib/i18n';
+import { listedPhoto, useHeroSrc } from '@/lib/media';
 import type { PageMeta } from '@/types/content';
 
 type Row = {
     title: string;
+    imageUrl: string | null;
+    sectorSlug: string | null;
     year: number;
     status: string;
     isPublished: boolean;
     sector: string;
+    showUrl: string;
     editUrl: string;
 };
 
@@ -29,6 +35,7 @@ export default function ProjectIndex({
     page: PageMeta;
 }) {
     const { t, locale } = useI18n();
+    const hero = useHeroSrc();
 
     return (
         <>
@@ -41,34 +48,55 @@ export default function ProjectIndex({
                     </PrimaryLink>
                 }
             />
-            <RecordList count={projects.length} empty={t('emptyRecords')}>
+            <DataTable
+                label={t('projects')}
+                count={projects.length}
+                empty={t('emptyRecords')}
+                columns={[
+                    { key: 'photo', label: t('photo') },
+                    { key: 'title', label: t('title') },
+                    { key: 'sector', label: t('sector') },
+                    { key: 'year', label: t('year') },
+                    { key: 'status', label: t('status') },
+                    { key: 'visibility', label: t('visibility') },
+                    { key: 'actions', label: t('actions'), align: 'end' },
+                ]}
+            >
                 {projects.map((project) => (
-                    <RecordRow key={project.editUrl}>
-                        <span className="min-w-0">
-                            <span className="block text-base font-medium">
-                                {project.title}
-                            </span>
-                            <Meta
-                                parts={[
-                                    project.sector,
-                                    String(project.year),
-                                    label(locale, project.status),
-                                ]}
+                    <DataRow key={project.editUrl}>
+                        <PhotoCell
+                            src={listedPhoto(
+                                project.imageUrl,
+                                project.sectorSlug,
+                                hero,
+                            )}
+                        />
+                        <DataCell primary>{project.title}</DataCell>
+                        <DataCell>{project.sector}</DataCell>
+                        <DataCell numeric>{project.year}</DataCell>
+                        <DataCell>{label(locale, project.status)}</DataCell>
+                        <DataCell>
+                            <StatusText
+                                on={project.isPublished}
+                                onLabel={t('visible')}
+                                offLabel={t('hidden')}
                             />
-                        </span>
-                        <span className="flex items-center gap-4">
-                            <Visibility
-                                published={project.isPublished}
-                                visible={t('visible')}
-                                hidden={t('hidden')}
+                        </DataCell>
+                        <ActionCell>
+                            <RowAction
+                                kind="view"
+                                href={project.showUrl}
+                                label={t('view')}
                             />
-                            <EditLink href={project.editUrl}>
-                                {t('edit')}
-                            </EditLink>
-                        </span>
-                    </RecordRow>
+                            <RowAction
+                                kind="edit"
+                                href={project.editUrl}
+                                label={t('edit')}
+                            />
+                        </ActionCell>
+                    </DataRow>
                 ))}
-            </RecordList>
+            </DataTable>
             <Pager page={page} />
         </>
     );

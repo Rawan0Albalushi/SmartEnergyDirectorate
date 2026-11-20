@@ -21,9 +21,24 @@ abstract class DirectorateFormRequest extends FormRequest
             }
         }
 
+        if ($this->exists('remove_image')) {
+            $merge['remove_image'] = $this->boolean('remove_image');
+        }
+
         if ($merge !== []) {
             $this->merge($merge);
         }
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    protected function imageRules(): array
+    {
+        return [
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_image' => ['sometimes', 'boolean'],
+        ];
     }
 
     /**
@@ -64,6 +79,7 @@ abstract class DirectorateFormRequest extends FormRequest
             'bio_ar' => $ar ? 'السيرة بالعربية' : 'Biography in Arabic',
             'bio_en' => $ar ? 'السيرة بالإنجليزية' : 'Biography in English',
             'photo' => $ar ? 'الصورة' : 'Photo',
+            'image' => $ar ? 'الصورة' : 'Photo',
             'roster' => $ar ? 'التصنيف' : 'Group',
             'email' => $ar ? 'البريد الإلكتروني' : 'Email',
             'phone' => $ar ? 'الهاتف' : 'Phone',

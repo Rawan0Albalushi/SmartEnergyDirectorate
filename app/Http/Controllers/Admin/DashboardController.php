@@ -32,6 +32,10 @@ class DashboardController extends Controller
                     'id' => $article->id,
                     'title' => $article->localized('title'),
                     'sourceName' => $article->source_name,
+                    'showUrl' => route('admin.news.show', [
+                        'locale' => app()->getLocale(),
+                        'newsArticle' => $article,
+                    ]),
                     'editUrl' => route('admin.news.edit', [
                         'locale' => app()->getLocale(),
                         'newsArticle' => $article,
@@ -55,6 +59,10 @@ class DashboardController extends Controller
                     'isActive' => $source->is_active,
                     'lastError' => $source->last_error,
                     'lastFetchedAt' => $source->last_fetched_at?->toIso8601String(),
+                    'showUrl' => route('admin.sources.show', [
+                        'locale' => app()->getLocale(),
+                        'newsSource' => $source,
+                    ]),
                 ])
                 ->values(),
         ]);

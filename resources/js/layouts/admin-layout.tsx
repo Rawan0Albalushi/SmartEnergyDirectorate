@@ -5,6 +5,7 @@ import {
     ClipboardList,
     FolderKanban,
     Gauge,
+    Image as ImageIcon,
     Layers,
     Menu,
     Newspaper,
@@ -20,6 +21,7 @@ import { useI18n, type TranslationKey } from '@/lib/i18n';
 
 const links: { key: TranslationKey; path: string; icon: LucideIcon }[] = [
     { key: 'dashboard', path: '', icon: ClipboardList },
+    { key: 'siteImages', path: '/media', icon: ImageIcon },
     { key: 'sectors', path: '/sectors', icon: Layers },
     { key: 'indicators', path: '/indicators', icon: Gauge },
     { key: 'projects', path: '/projects', icon: FolderKanban },
@@ -166,9 +168,6 @@ export default function AdminLayout({
                                 English
                             </Link>
                         </div>
-                        <Utility href="/settings/profile">
-                            {t('settings')}
-                        </Utility>
                         <button
                             type="button"
                             className="inline-flex min-h-11 cursor-pointer items-center rounded-[6px] px-3 text-start text-sm text-[#d7ebe4] transition-colors duration-150 hover:bg-white/10 hover:text-white"

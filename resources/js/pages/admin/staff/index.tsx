@@ -1,12 +1,14 @@
 import { Head } from '@inertiajs/react';
 import {
-    EditLink,
-    Meta,
+    ActionCell,
+    DataCell,
+    PhotoCell,
+    DataRow,
+    DataTable,
     PageIntro,
     PrimaryLink,
-    RecordList,
-    RecordRow,
-    Visibility,
+    RowAction,
+    StatusText,
 } from '@/components/admin/chrome';
 import { Pager } from '@/components/public/pager';
 import { label, useI18n } from '@/lib/i18n';
@@ -14,10 +16,12 @@ import type { PageMeta } from '@/types/content';
 
 type Row = {
     name: string;
+    imageUrl: string | null;
     title: string;
     department: string;
     roster: string;
     isPublished: boolean;
+    showUrl: string;
     editUrl: string;
 };
 
@@ -41,34 +45,49 @@ export default function StaffIndex({
                     </PrimaryLink>
                 }
             />
-            <RecordList count={staff.length} empty={t('emptyRecords')}>
+            <DataTable
+                label={t('staff')}
+                count={staff.length}
+                empty={t('emptyRecords')}
+                columns={[
+                    { key: 'photo', label: t('photo') },
+                    { key: 'name', label: t('name') },
+                    { key: 'title', label: t('jobTitle') },
+                    { key: 'department', label: t('department') },
+                    { key: 'roster', label: t('roster') },
+                    { key: 'visibility', label: t('visibility') },
+                    { key: 'actions', label: t('actions'), align: 'end' },
+                ]}
+            >
                 {staff.map((member) => (
-                    <RecordRow key={member.editUrl}>
-                        <span className="min-w-0">
-                            <span className="block text-base font-medium">
-                                {member.name}
-                            </span>
-                            <Meta
-                                parts={[
-                                    member.title,
-                                    member.department,
-                                    label(locale, member.roster),
-                                ]}
+                    <DataRow key={member.editUrl}>
+                        <PhotoCell src={member.imageUrl} />
+                        <DataCell primary>{member.name}</DataCell>
+                        <DataCell>{member.title || '—'}</DataCell>
+                        <DataCell>{member.department || '—'}</DataCell>
+                        <DataCell>{label(locale, member.roster)}</DataCell>
+                        <DataCell>
+                            <StatusText
+                                on={member.isPublished}
+                                onLabel={t('visible')}
+                                offLabel={t('hidden')}
                             />
-                        </span>
-                        <span className="flex items-center gap-4">
-                            <Visibility
-                                published={member.isPublished}
-                                visible={t('visible')}
-                                hidden={t('hidden')}
+                        </DataCell>
+                        <ActionCell>
+                            <RowAction
+                                kind="view"
+                                href={member.showUrl}
+                                label={t('view')}
                             />
-                            <EditLink href={member.editUrl}>
-                                {t('edit')}
-                            </EditLink>
-                        </span>
-                    </RecordRow>
+                            <RowAction
+                                kind="edit"
+                                href={member.editUrl}
+                                label={t('edit')}
+                            />
+                        </ActionCell>
+                    </DataRow>
                 ))}
-            </RecordList>
+            </DataTable>
             <Pager page={page} />
         </>
     );

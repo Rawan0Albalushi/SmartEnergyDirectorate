@@ -1,24 +1,29 @@
 import { Head } from '@inertiajs/react';
 import {
-    CommandButton,
-    EditLink,
+    ActionCell,
+    DataCell,
+    PhotoCell,
+    DataRow,
+    DataTable,
     FilterLink,
-    Meta,
     PageIntro,
     PrimaryLink,
-    RecordList,
-    RecordRow,
+    RowAction,
 } from '@/components/admin/chrome';
 import { Pager } from '@/components/public/pager';
 import { label, useI18n } from '@/lib/i18n';
+import { listedPhoto, useHeroSrc } from '@/lib/media';
 import type { PageMeta } from '@/types/content';
 
 type Row = {
     title: string;
+    imageUrl: string | null;
+    sectorSlug: string | null;
     scope: string;
     status: string;
     origin: string;
     sourceName: string | null;
+    showUrl: string;
     editUrl: string;
     publishUrl: string;
     rejectUrl: string;
@@ -34,6 +39,7 @@ export default function NewsIndex({
     activeStatus: string | null;
 }) {
     const { t, locale } = useI18n();
+    const hero = useHeroSrc();
     const filters = [
         { value: '', label: t('all') },
         { value: 'pending', label: t('pending') },
@@ -71,43 +77,61 @@ export default function NewsIndex({
                     </FilterLink>
                 ))}
             </div>
-            <RecordList count={articles.length} empty={t('emptyRecords')}>
+            <DataTable
+                label={t('news')}
+                count={articles.length}
+                empty={t('emptyRecords')}
+                columns={[
+                    { key: 'photo', label: t('photo') },
+                    { key: 'title', label: t('title') },
+                    { key: 'scope', label: t('scope') },
+                    { key: 'status', label: t('status') },
+                    { key: 'origin', label: t('origin') },
+                    { key: 'source', label: t('source') },
+                    { key: 'actions', label: t('actions'), align: 'end' },
+                ]}
+            >
                 {articles.map((article) => (
-                    <RecordRow key={article.editUrl}>
-                        <span className="min-w-0">
-                            <span className="block text-base font-medium">
-                                {article.title}
-                            </span>
-                            <Meta
-                                parts={[
-                                    label(locale, article.scope),
-                                    label(locale, article.status),
-                                    label(locale, article.origin),
-                                    article.sourceName,
-                                ]}
+                    <DataRow key={article.editUrl}>
+                        <PhotoCell
+                            src={listedPhoto(
+                                article.imageUrl,
+                                article.sectorSlug,
+                                hero,
+                            )}
+                        />
+                        <DataCell primary>{article.title}</DataCell>
+                        <DataCell>{label(locale, article.scope)}</DataCell>
+                        <DataCell>{label(locale, article.status)}</DataCell>
+                        <DataCell>{label(locale, article.origin)}</DataCell>
+                        <DataCell>{article.sourceName || '—'}</DataCell>
+                        <ActionCell>
+                            <RowAction
+                                kind="view"
+                                href={article.showUrl}
+                                label={t('view')}
                             />
-                        </span>
-                        <span className="flex flex-wrap items-center gap-2">
-                            <CommandButton
+                            <RowAction
+                                kind="publish"
                                 href={article.publishUrl}
                                 method="post"
-                            >
-                                {t('publish')}
-                            </CommandButton>
-                            <CommandButton
+                                label={t('publish')}
+                            />
+                            <RowAction
+                                kind="reject"
                                 href={article.rejectUrl}
                                 method="delete"
-                                tone="danger"
-                            >
-                                {t('reject')}
-                            </CommandButton>
-                            <EditLink href={article.editUrl}>
-                                {t('edit')}
-                            </EditLink>
-                        </span>
-                    </RecordRow>
+                                label={t('reject')}
+                            />
+                            <RowAction
+                                kind="edit"
+                                href={article.editUrl}
+                                label={t('edit')}
+                            />
+                        </ActionCell>
+                    </DataRow>
                 ))}
-            </RecordList>
+            </DataTable>
             <Pager page={page} />
         </>
     );

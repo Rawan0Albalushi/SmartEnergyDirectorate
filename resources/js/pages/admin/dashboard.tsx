@@ -1,12 +1,14 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Building2, FolderKanban, Gauge, Newspaper } from 'lucide-react';
 import {
-    CommandButton,
-    Meta,
+    ActionCell,
+    DataCell,
+    DataRow,
+    DataTable,
     PageIntro,
-    RecordList,
-    RecordRow,
+    RowAction,
     StatCards,
+    StatusText,
     primaryButtonClass,
 } from '@/components/admin/chrome';
 import { formatDate } from '@/lib/format';
@@ -16,6 +18,7 @@ type Pending = {
     id: number;
     title: string;
     sourceName: string | null;
+    showUrl: string;
     editUrl: string;
     publishUrl: string;
     rejectUrl: string;
@@ -27,6 +30,7 @@ type SourceRow = {
     isActive: boolean;
     lastError: string | null;
     lastFetchedAt: string | null;
+    showUrl: string;
 };
 
 export default function Dashboard({
@@ -110,68 +114,94 @@ export default function Dashboard({
             />
             <StatCards items={figures} />
             <h2 className="mt-12 text-xl font-medium">{t('reviewQueue')}</h2>
-            <RecordList
-                count={pending.length === 0 ? 0 : pending.length}
+            <DataTable
+                label={t('reviewQueue')}
+                count={pending.length}
                 empty={t('noPending')}
+                columns={[
+                    { key: 'title', label: t('title') },
+                    { key: 'source', label: t('source') },
+                    { key: 'actions', label: t('actions'), align: 'end' },
+                ]}
             >
                 {pending.map((item) => (
-                    <RecordRow key={item.id}>
-                        <span className="min-w-0">
-                            <Link
-                                href={item.editUrl}
-                                className="text-base font-medium underline-offset-4 hover:underline"
-                            >
-                                {item.title}
-                            </Link>
-                            {item.sourceName ? (
-                                <Meta parts={[item.sourceName]} />
-                            ) : null}
-                        </span>
-                        <span className="flex flex-wrap gap-2">
-                            <CommandButton href={item.publishUrl} method="post">
-                                {t('publish')}
-                            </CommandButton>
-                            <CommandButton
+                    <DataRow key={item.id}>
+                        <DataCell primary>{item.title}</DataCell>
+                        <DataCell>{item.sourceName || '—'}</DataCell>
+                        <ActionCell>
+                            <RowAction
+                                kind="view"
+                                href={item.showUrl}
+                                label={t('view')}
+                            />
+                            <RowAction
+                                kind="publish"
+                                href={item.publishUrl}
+                                method="post"
+                                label={t('publish')}
+                            />
+                            <RowAction
+                                kind="reject"
                                 href={item.rejectUrl}
                                 method="delete"
-                                tone="danger"
-                            >
-                                {t('reject')}
-                            </CommandButton>
-                        </span>
-                    </RecordRow>
-                ))}
-            </RecordList>
-            <h2 className="mt-12 text-xl font-medium">{t('sources')}</h2>
-            <RecordList count={sources.length} empty={t('emptyRecords')}>
-                {sources.map((source) => (
-                    <RecordRow key={source.id}>
-                        <span className="min-w-0">
-                            <span className="block text-base font-medium">
-                                {source.name}
-                            </span>
-                            <Meta
-                                parts={[
-                                    source.isActive
-                                        ? t('active')
-                                        : t('inactive'),
-                                    source.lastFetchedAt
-                                        ? formatDate(
-                                              source.lastFetchedAt,
-                                              locale,
-                                          )
-                                        : null,
-                                ]}
+                                label={t('reject')}
                             />
-                            {source.lastError ? (
-                                <p className="mt-1 text-sm text-[#9f2c22]">
-                                    {source.lastError}
-                                </p>
-                            ) : null}
-                        </span>
-                    </RecordRow>
+                            <RowAction
+                                kind="edit"
+                                href={item.editUrl}
+                                label={t('edit')}
+                            />
+                        </ActionCell>
+                    </DataRow>
                 ))}
-            </RecordList>
+            </DataTable>
+            <h2 className="mt-12 text-xl font-medium">{t('sources')}</h2>
+            <DataTable
+                label={t('sources')}
+                count={sources.length}
+                empty={t('emptyRecords')}
+                columns={[
+                    { key: 'name', label: t('name') },
+                    { key: 'status', label: t('status') },
+                    { key: 'fetched', label: t('fetchedAt') },
+                    { key: 'error', label: t('lastError') },
+                    { key: 'actions', label: t('actions'), align: 'end' },
+                ]}
+            >
+                {sources.map((source) => (
+                    <DataRow key={source.id}>
+                        <DataCell primary>{source.name}</DataCell>
+                        <DataCell>
+                            <StatusText
+                                on={source.isActive}
+                                onLabel={t('active')}
+                                offLabel={t('inactive')}
+                            />
+                        </DataCell>
+                        <DataCell>
+                            {source.lastFetchedAt
+                                ? formatDate(source.lastFetchedAt, locale)
+                                : '—'}
+                        </DataCell>
+                        <DataCell wrap>
+                            {source.lastError ? (
+                                <span className="text-[#9f2c22]">
+                                    {source.lastError}
+                                </span>
+                            ) : (
+                                '—'
+                            )}
+                        </DataCell>
+                        <ActionCell>
+                            <RowAction
+                                kind="view"
+                                href={source.showUrl}
+                                label={t('view')}
+                            />
+                        </ActionCell>
+                    </DataRow>
+                ))}
+            </DataTable>
         </>
     );
 }

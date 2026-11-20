@@ -12,6 +12,7 @@ export type SectorLink = {
 
 export type SectorSummary = SectorLink & {
     summary: string;
+    imageUrl: string | null;
 };
 
 export type SectorDetail = SectorSummary & {
@@ -45,6 +46,7 @@ export type ProjectSummary = {
     status: string;
     year: number;
     location: string;
+    imageUrl: string | null;
     sector: SectorLink | null;
 };
 
@@ -57,6 +59,7 @@ export type AchievementItem = {
     title: string;
     summary: string;
     year: number;
+    imageUrl: string | null;
     sector: SectorLink | null;
 };
 
@@ -67,6 +70,7 @@ export type NewsSummary = {
     scope: string;
     publishedAt: string | null;
     sourceName: string | null;
+    imageUrl: string | null;
     sector: SectorLink | null;
 };
 
@@ -81,6 +85,7 @@ export type DepartmentSummary = {
     summary: string;
     email: string | null;
     phone: string | null;
+    imageUrl: string | null;
 };
 
 export type DepartmentDetail = DepartmentSummary & {

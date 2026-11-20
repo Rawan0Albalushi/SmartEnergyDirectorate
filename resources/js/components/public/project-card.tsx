@@ -39,8 +39,9 @@ export function ProjectCard({
         >
             <span className="block aspect-[8/5] overflow-hidden bg-[#e7eeea]">
                 <FieldPhoto
+                    src={project.imageUrl}
                     slug={known ? project.sector?.slug : undefined}
-                    horizon={!known}
+                    horizon={!project.imageUrl && !known}
                     alt=""
                     className={`h-full w-full object-cover transition duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100 ${crops[index % crops.length]}`}
                 />

@@ -6,6 +6,7 @@ import {
     RecordForm,
     TextField,
 } from '@/components/admin/fields';
+import { ImageField } from '@/components/admin/image-field';
 import { useI18n } from '@/lib/i18n';
 
 type DepartmentFormData = {
@@ -18,6 +19,7 @@ type DepartmentFormData = {
     email: string | null;
     phone: string | null;
     sort_order: number;
+    image_url?: string | null;
 };
 
 export default function DepartmentForm({
@@ -42,14 +44,23 @@ export default function DepartmentForm({
         email: department?.email ?? '',
         phone: department?.phone ?? '',
         sort_order: String(department?.sort_order ?? 0),
+        image: null as File | null,
+        remove_image: false,
     });
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        form.transform((data) => ({
+            ...data,
+            image: data.image ?? '',
+            remove_image: data.remove_image ? '1' : '0',
+        }));
+        const options = { forceFormData: true };
+
         if (method === 'post') {
-            form.post(submitUrl);
+            form.post(submitUrl, options);
         } else {
-            form.put(submitUrl);
+            form.put(submitUrl, options);
         }
     }
 
@@ -133,6 +144,21 @@ export default function DepartmentForm({
                         onChange={(value) => form.setData('phone', value)}
                     />
                 </FieldPair>
+                <ImageField
+                    label={t('photo')}
+                    hint={t('imageHint')}
+                    currentUrl={department?.image_url}
+                    remove={form.data.remove_image}
+                    error={form.errors.image}
+                    onFile={(file) =>
+                        form.setData({
+                            ...form.data,
+                            image: file,
+                            remove_image: file ? false : form.data.remove_image,
+                        })
+                    }
+                    onRemove={(remove) => form.setData('remove_image', remove)}
+                />
                 <TextField
                     id="sort_order"
                     label={t('sortOrder')}

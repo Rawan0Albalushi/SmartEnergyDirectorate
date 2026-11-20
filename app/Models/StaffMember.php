@@ -4,12 +4,12 @@ namespace App\Models;
 
 use App\Enums\StaffRoster;
 use App\Models\Concerns\HasLocalizedText;
+use App\Support\StoredImage;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id
@@ -58,9 +58,7 @@ class StaffMember extends Model
     protected static function booted(): void
     {
         static::deleting(function (StaffMember $member): void {
-            if (is_string($member->photo_path) && $member->photo_path !== '') {
-                Storage::disk('public')->delete($member->photo_path);
-            }
+            StoredImage::delete($member->photo_path);
         });
     }
 
@@ -93,9 +91,7 @@ class StaffMember extends Model
             'title' => $this->localized('title'),
             'email' => $this->email,
             'bio' => $this->localized('bio'),
-            'photoUrl' => is_string($this->photo_path) && $this->photo_path !== ''
-                ? Storage::disk('public')->url($this->photo_path)
-                : null,
+            'photoUrl' => StoredImage::url($this->photo_path),
             'department' => $this->relationLoaded('department')
                 ? $this->department?->localized('name')
                 : null,

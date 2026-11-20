@@ -26,6 +26,7 @@ class SaveNewsArticleRequest extends DirectorateFormRequest
             'source_name' => ['nullable', 'string', 'max:255'],
             'original_url' => ['nullable', 'url', 'max:2048'],
             'published_at' => ['nullable', 'date'],
+            ...$this->imageRules(),
         ];
     }
 }

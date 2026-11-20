@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import { FieldPhoto } from '@/components/public/field-photo';
 import { SectionHeading } from '@/components/public/section-heading';
-import { horizon } from '@/lib/fields';
 import { useI18n } from '@/lib/i18n';
+import { useHeroSrc } from '@/lib/media';
 import type { AchievementItem, SectorLink } from '@/types/content';
 
 const sectorIcons: Record<string, LucideIcon> = {
@@ -28,6 +28,7 @@ export function HomeAchievements({
     achievements: AchievementItem[];
 }) {
     const { t, locale } = useI18n();
+    const hero = useHeroSrc();
 
     return (
         <section
@@ -35,7 +36,7 @@ export function HomeAchievements({
             aria-labelledby="home-achievements"
         >
             <img
-                src={horizon.src}
+                src={hero}
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover object-[center_36%]"
             />
@@ -71,19 +72,13 @@ export function HomeAchievements({
                             className="flex flex-col gap-3 rounded-2xl border border-white/80 bg-white p-3 shadow-[0_16px_40px_-24px_rgba(12,46,42,0.65)] sm:flex-row sm:items-center sm:gap-4 sm:p-4"
                         >
                             <span className="block h-36 w-full shrink-0 overflow-hidden rounded-xl bg-[#e7eeea] sm:h-28 sm:w-40">
-                                {item.sector ? (
-                                    <FieldPhoto
-                                        slug={item.sector.slug}
-                                        alt=""
-                                        className="h-full w-full object-cover"
-                                    />
-                                ) : (
-                                    <img
-                                        src={horizon.src}
-                                        alt=""
-                                        className="h-full w-full object-cover"
-                                    />
-                                )}
+                                <FieldPhoto
+                                    src={item.imageUrl}
+                                    slug={item.sector?.slug}
+                                    horizon={!item.imageUrl && !item.sector}
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                />
                             </span>
                             <span className="min-w-0 flex-1">
                                 <span className="inline-flex items-center gap-1.5 text-sm text-[#3E534C]">

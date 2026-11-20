@@ -7,6 +7,7 @@ import {
     SelectField,
     TextField,
 } from '@/components/admin/fields';
+import { ImageField } from '@/components/admin/image-field';
 import { useI18n } from '@/lib/i18n';
 import type { Option } from '@/types/content';
 
@@ -24,6 +25,7 @@ type ArticleFormData = {
     original_url: string | null;
     published_at: string | null;
     origin?: string;
+    image_url?: string | null;
 };
 
 export default function NewsForm({
@@ -53,14 +55,23 @@ export default function NewsForm({
         source_name: article?.source_name ?? '',
         original_url: article?.original_url ?? '',
         published_at: article?.published_at ?? '',
+        image: null as File | null,
+        remove_image: false,
     });
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        form.transform((data) => ({
+            ...data,
+            image: data.image ?? '',
+            remove_image: data.remove_image ? '1' : '0',
+        }));
+        const options = { forceFormData: true };
+
         if (method === 'post') {
-            form.post(submitUrl);
+            form.post(submitUrl, options);
         } else {
-            form.put(submitUrl);
+            form.put(submitUrl, options);
         }
     }
 
@@ -197,6 +208,21 @@ export default function NewsForm({
                         }
                     />
                 </FieldPair>
+                <ImageField
+                    label={t('photo')}
+                    hint={t('imageHint')}
+                    currentUrl={article?.image_url}
+                    remove={form.data.remove_image}
+                    error={form.errors.image}
+                    onFile={(file) =>
+                        form.setData({
+                            ...form.data,
+                            image: file,
+                            remove_image: file ? false : form.data.remove_image,
+                        })
+                    }
+                    onRemove={(remove) => form.setData('remove_image', remove)}
+                />
             </RecordForm>
         </>
     );

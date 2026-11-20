@@ -1,11 +1,13 @@
 import { Head } from '@inertiajs/react';
 import {
-    EditLink,
-    Meta,
+    ActionCell,
+    DataCell,
+    DataRow,
+    DataTable,
     PageIntro,
     PrimaryLink,
-    RecordList,
-    RecordRow,
+    RowAction,
+    StatusText,
 } from '@/components/admin/chrome';
 import { label, useI18n } from '@/lib/i18n';
 
@@ -17,6 +19,7 @@ type Row = {
     scope: string;
     isActive: boolean;
     lastError: string | null;
+    showUrl: string;
     editUrl: string;
 };
 
@@ -35,35 +38,61 @@ export default function SourceIndex({ sources }: { sources: Row[] }) {
                     </PrimaryLink>
                 }
             />
-            <RecordList count={sources.length} empty={t('emptyRecords')}>
+            <DataTable
+                label={t('sources')}
+                count={sources.length}
+                empty={t('emptyRecords')}
+                columns={[
+                    { key: 'name', label: t('name') },
+                    { key: 'feed', label: t('feedUrl') },
+                    { key: 'language', label: t('feedLanguage') },
+                    { key: 'scope', label: t('scope') },
+                    { key: 'status', label: t('status') },
+                    { key: 'error', label: t('lastError') },
+                    { key: 'actions', label: t('actions'), align: 'end' },
+                ]}
+            >
                 {sources.map((source) => (
-                    <RecordRow key={source.id}>
-                        <span className="min-w-0">
-                            <span className="block text-base font-medium">
-                                {source.name}
-                            </span>
-                            <p className="mt-1 text-sm break-all text-[#3e534c]">
+                    <DataRow key={source.id}>
+                        <DataCell primary>{source.name}</DataCell>
+                        <DataCell wrap>
+                            <span className="block max-w-md break-all text-[#3e534c]">
                                 {source.feedUrl}
-                            </p>
-                            <Meta
-                                parts={[
-                                    source.locale,
-                                    label(locale, source.scope),
-                                    source.isActive
-                                        ? t('active')
-                                        : t('inactive'),
-                                ]}
+                            </span>
+                        </DataCell>
+                        <DataCell>{source.locale}</DataCell>
+                        <DataCell>{label(locale, source.scope)}</DataCell>
+                        <DataCell>
+                            <StatusText
+                                on={source.isActive}
+                                onLabel={t('active')}
+                                offLabel={t('inactive')}
                             />
+                        </DataCell>
+                        <DataCell wrap>
                             {source.lastError ? (
-                                <p className="mt-1 text-sm text-[#9f2c22]">
+                                <span className="text-[#9f2c22]">
                                     {source.lastError}
-                                </p>
-                            ) : null}
-                        </span>
-                        <EditLink href={source.editUrl}>{t('edit')}</EditLink>
-                    </RecordRow>
+                                </span>
+                            ) : (
+                                '—'
+                            )}
+                        </DataCell>
+                        <ActionCell>
+                            <RowAction
+                                kind="view"
+                                href={source.showUrl}
+                                label={t('view')}
+                            />
+                            <RowAction
+                                kind="edit"
+                                href={source.editUrl}
+                                label={t('edit')}
+                            />
+                        </ActionCell>
+                    </DataRow>
                 ))}
-            </RecordList>
+            </DataTable>
         </>
     );
 }

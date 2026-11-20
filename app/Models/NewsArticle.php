@@ -6,6 +6,7 @@ use App\Enums\ContentOrigin;
 use App\Enums\NewsScope;
 use App\Enums\NewsStatus;
 use App\Models\Concerns\HasLocalizedText;
+use App\Models\Concerns\HasStoredImage;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $external_guid
  * @property CarbonImmutable|null $published_at
  * @property CarbonImmutable|null $reviewed_at
+ * @property string|null $image_path
  * @property Sector|null $sector
  */
 #[Fillable([
@@ -56,6 +58,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class NewsArticle extends Model
 {
     use HasLocalizedText;
+    use HasStoredImage;
 
     /**
      * @return array<string, string>
@@ -113,7 +116,8 @@ class NewsArticle extends Model
      *     scope: string,
      *     publishedAt: ?string,
      *     sourceName: ?string,
-     *     sector: array{slug: string, name: string}|null
+     *     sector: array{slug: string, name: string}|null,
+     *     imageUrl: ?string
      * }
      */
     public function toSummaryArray(): array
@@ -125,6 +129,7 @@ class NewsArticle extends Model
             'scope' => $this->scope->value,
             'publishedAt' => $this->published_at?->toIso8601String(),
             'sourceName' => $this->source_name,
+            'imageUrl' => $this->storedImageUrl(),
             'sector' => $this->relationLoaded('sector') && $this->sector !== null
                 ? [
                     'slug' => $this->sector->slug,
@@ -143,6 +148,7 @@ class NewsArticle extends Model
      *     publishedAt: ?string,
      *     sourceName: ?string,
      *     sector: array{slug: string, name: string}|null,
+     *     imageUrl: ?string,
      *     body: string,
      *     originalUrl: ?string
      * }

@@ -1,6 +1,8 @@
-import { fieldPlate, horizon } from '@/lib/fields';
+import { fieldPlate } from '@/lib/fields';
+import { useHeroSrc } from '@/lib/media';
 
 type Props = {
+    src?: string | null;
     slug?: string | null;
     horizon?: boolean;
     alt: string;
@@ -9,13 +11,20 @@ type Props = {
 };
 
 export function FieldPhoto({
+    src,
     slug,
     horizon: wide,
     alt,
     className,
     priority = false,
 }: Props) {
-    const plate = wide ? horizon : fieldPlate(slug);
+    const hero = useHeroSrc();
+    const custom = typeof src === 'string' && src !== '' ? src : null;
+    const plate = custom
+        ? { src: custom }
+        : wide
+          ? { src: hero }
+          : fieldPlate(slug);
 
     if (!plate) {
         return null;

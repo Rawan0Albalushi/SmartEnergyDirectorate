@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\SiteSetting;
 use App\Support\LocaleUrl;
+use App\Support\StoredImage;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -51,6 +53,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'flash' => [
                 'status' => $request->session()->get('status'),
+            ],
+            'media' => [
+                'hero' => StoredImage::url(SiteSetting::value(SiteSetting::HERO)),
             ],
         ];
     }

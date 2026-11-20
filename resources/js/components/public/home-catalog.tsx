@@ -226,6 +226,7 @@ function StageCard({
     return (
         <article className="relative flex h-full min-h-72 flex-col overflow-hidden rounded-[1.6rem] bg-deep text-white max-lg:order-first">
             <FieldPhoto
+                src={featured?.imageUrl}
                 slug={featured?.slug ?? 'renewable'}
                 horizon={featured === null}
                 alt=""

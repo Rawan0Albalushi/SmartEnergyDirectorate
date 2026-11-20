@@ -19,6 +19,7 @@ class SaveDepartmentRequest extends DirectorateFormRequest
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:40'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
+            ...$this->imageRules(),
         ];
     }
 }

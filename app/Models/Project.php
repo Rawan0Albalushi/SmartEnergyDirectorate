@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProjectStatus;
 use App\Models\Concerns\HasLocalizedText;
+use App\Models\Concerns\HasStoredImage;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $location_en
  * @property int $year
  * @property bool $is_published
+ * @property string|null $image_path
  * @property Sector|null $sector
  */
 #[Fillable([
@@ -45,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Project extends Model
 {
     use HasLocalizedText;
+    use HasStoredImage;
 
     /**
      * @return array<string, string>
@@ -88,7 +91,8 @@ class Project extends Model
      *     status: string,
      *     year: int,
      *     location: string,
-     *     sector: array{slug: string, name: string}|null
+     *     sector: array{slug: string, name: string}|null,
+     *     imageUrl: ?string
      * }
      */
     public function toSummaryArray(): array
@@ -100,6 +104,7 @@ class Project extends Model
             'status' => $this->status->value,
             'year' => $this->year,
             'location' => $this->localized('location'),
+            'imageUrl' => $this->storedImageUrl(),
             'sector' => $this->relationLoaded('sector') && $this->sector !== null
                 ? [
                     'slug' => $this->sector->slug,
@@ -118,6 +123,7 @@ class Project extends Model
      *     year: int,
      *     location: string,
      *     sector: array{slug: string, name: string}|null,
+     *     imageUrl: ?string,
      *     body: string
      * }
      */

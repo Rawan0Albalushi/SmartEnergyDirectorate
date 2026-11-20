@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveDepartmentRequest;
 use App\Models\Department;
+use App\Support\RecordDetails;
 use App\Support\SlugGenerator;
+use App\Support\StoredImage;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -22,7 +24,13 @@ class DepartmentController extends Controller
                 ->get()
                 ->map(fn (Department $department): array => [
                     'name' => $department->localized('name'),
+                    'slug' => $department->slug,
+                    'imageUrl' => StoredImage::url($department->image_path),
                     'staffCount' => $department->staff_members_count,
+                    'showUrl' => route('admin.departments.show', [
+                        'locale' => app()->getLocale(),
+                        'department' => $department,
+                    ]),
                     'editUrl' => route('admin.departments.edit', [
                         'locale' => app()->getLocale(),
                         'department' => $department,
@@ -53,6 +61,30 @@ class DepartmentController extends Controller
             ->with('status', __('Saved.'));
     }
 
+    public function show(string $locale, Department $department): Response
+    {
+        $department->loadCount('staffMembers');
+
+        return Inertia::render('admin/details', RecordDetails::make(
+            $department->localized('name'),
+            route('admin.departments.index', ['locale' => app()->getLocale()]),
+            route('admin.departments.edit', ['locale' => app()->getLocale(), 'department' => $department]),
+            [
+                RecordDetails::text('nameAr', $department->name_ar),
+                RecordDetails::text('nameEn', $department->name_en),
+                RecordDetails::text('summaryAr', $department->summary_ar),
+                RecordDetails::text('summaryEn', $department->summary_en),
+                RecordDetails::text('mandateAr', $department->mandate_ar),
+                RecordDetails::text('mandateEn', $department->mandate_en),
+                RecordDetails::text('email', $department->email),
+                RecordDetails::text('phone', $department->phone),
+                RecordDetails::image('photo', StoredImage::url($department->image_path)),
+                RecordDetails::text('staff', $department->staff_members_count),
+                RecordDetails::text('sortOrder', $department->sort_order),
+            ],
+        ));
+    }
+
     public function edit(string $locale, Department $department): Response
     {
         return Inertia::render('admin/departments/form', [
@@ -66,6 +98,7 @@ class DepartmentController extends Controller
                 'email' => $department->email,
                 'phone' => $department->phone,
                 'sort_order' => $department->sort_order,
+                'image_url' => StoredImage::url($department->image_path),
             ],
             'submitUrl' => route('admin.departments.update', [
                 'locale' => app()->getLocale(),
@@ -111,5 +144,11 @@ class DepartmentController extends Controller
             'phone',
         ]));
         $department->sort_order = $request->integer('sort_order');
+        $department->image_path = StoredImage::replace(
+            $department->image_path,
+            $request->file('image'),
+            $request->boolean('remove_image'),
+            'departments',
+        );
     }
 }

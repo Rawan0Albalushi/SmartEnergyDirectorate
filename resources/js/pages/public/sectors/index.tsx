@@ -52,6 +52,7 @@ export default function SectorsIndex({ sectors }: { sectors: SectorRecord[] }) {
                                         }
                                     >
                                         <FieldPhoto
+                                            src={sector.imageUrl}
                                             slug={sector.slug}
                                             alt=""
                                             className="aspect-video w-full rounded-2xl object-cover lg:aspect-[5/4]"
@@ -181,6 +182,7 @@ function SectorFacts({ sector }: { sector: SectorRecord }) {
                         >
                             <span className="relative w-28 shrink-0 self-stretch sm:w-40">
                                 <FieldPhoto
+                                    src={project.imageUrl || sector.imageUrl}
                                     slug={sector.slug}
                                     alt=""
                                     className={`absolute inset-0 h-full w-full object-cover ${cropPositions[index % cropPositions.length]}`}

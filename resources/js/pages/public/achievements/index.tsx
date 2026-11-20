@@ -4,7 +4,8 @@ import { SectorGlyph } from '@/components/public/entry';
 import { PageBody } from '@/components/public/frame';
 import { PageIntro } from '@/components/public/page-intro';
 import { Pager } from '@/components/public/pager';
-import { fieldPlate, horizon } from '@/lib/fields';
+import { fieldPlate } from '@/lib/fields';
+import { useHeroSrc } from '@/lib/media';
 import { useI18n } from '@/lib/i18n';
 import type { AchievementItem, PageMeta } from '@/types/content';
 
@@ -178,11 +179,12 @@ function groupByYear(achievements: AchievementItem[]) {
 }
 
 function AchievementPhoto({ item }: { item: AchievementItem }) {
+    const hero = useHeroSrc();
     const plate = fieldPlate(item.sector?.slug);
 
     return (
         <img
-            src={plate?.src ?? horizon.src}
+            src={item.imageUrl || plate?.src || hero}
             alt=""
             width={1200}
             height={900}

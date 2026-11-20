@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveNewsSourceRequest;
 use App\Models\NewsSource;
 use App\Support\CatalogOptions;
+use App\Support\RecordDetails;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -26,6 +27,10 @@ class NewsSourceController extends Controller
                     'scope' => $source->scope->value,
                     'isActive' => $source->is_active,
                     'lastError' => $source->last_error,
+                    'showUrl' => route('admin.sources.show', [
+                        'locale' => app()->getLocale(),
+                        'newsSource' => $source,
+                    ]),
                     'editUrl' => route('admin.sources.edit', [
                         'locale' => app()->getLocale(),
                         'newsSource' => $source,
@@ -54,6 +59,28 @@ class NewsSourceController extends Controller
         return redirect()
             ->route('admin.sources.index', ['locale' => app()->getLocale()])
             ->with('status', __('Saved.'));
+    }
+
+    public function show(string $locale, NewsSource $newsSource): Response
+    {
+        $newsSource->load('sector');
+
+        return Inertia::render('admin/details', RecordDetails::make(
+            $newsSource->localized('name'),
+            route('admin.sources.index', ['locale' => app()->getLocale()]),
+            route('admin.sources.edit', ['locale' => app()->getLocale(), 'newsSource' => $newsSource]),
+            [
+                RecordDetails::text('sector', $newsSource->sector?->localized('name')),
+                RecordDetails::text('nameAr', $newsSource->name_ar),
+                RecordDetails::text('nameEn', $newsSource->name_en),
+                RecordDetails::text('feedUrl', $newsSource->feed_url),
+                RecordDetails::text('feedLanguage', $newsSource->locale),
+                RecordDetails::code('scope', $newsSource->scope->value),
+                RecordDetails::flag('status', $newsSource->is_active, 'active'),
+                RecordDetails::date('fetchedAt', $newsSource->last_fetched_at?->toIso8601String()),
+                RecordDetails::text('lastError', $newsSource->last_error),
+            ],
+        ));
     }
 
     public function edit(string $locale, NewsSource $newsSource, CatalogOptions $catalog): Response

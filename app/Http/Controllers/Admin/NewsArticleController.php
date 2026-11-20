@@ -9,7 +9,9 @@ use App\Http\Requests\SaveNewsArticleRequest;
 use App\Models\NewsArticle;
 use App\Support\CatalogOptions;
 use App\Support\PageMeta;
+use App\Support\RecordDetails;
 use App\Support\SlugGenerator;
+use App\Support\StoredImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -26,6 +28,7 @@ class NewsArticleController extends Controller
         }
 
         $articles = NewsArticle::query()
+            ->with('sector')
             ->when($status !== null, fn ($query) => $query->where('status', $status))
             ->orderByDesc('id')
             ->paginate(15)
@@ -34,10 +37,16 @@ class NewsArticleController extends Controller
         return Inertia::render('admin/news/index', [
             'articles' => $articles->getCollection()->map(fn (NewsArticle $article): array => [
                 'title' => $article->localized('title'),
+                'imageUrl' => StoredImage::url($article->image_path),
+                'sectorSlug' => $article->sector?->slug,
                 'scope' => $article->scope->value,
                 'status' => $article->status->value,
                 'origin' => $article->origin->value,
                 'sourceName' => $article->source_name,
+                'showUrl' => route('admin.news.show', [
+                    'locale' => app()->getLocale(),
+                    'newsArticle' => $article,
+                ]),
                 'editUrl' => route('admin.news.edit', [
                     'locale' => app()->getLocale(),
                     'newsArticle' => $article,
@@ -80,6 +89,33 @@ class NewsArticleController extends Controller
             ->with('status', __('Saved.'));
     }
 
+    public function show(string $locale, NewsArticle $newsArticle): Response
+    {
+        $newsArticle->load('sector');
+
+        return Inertia::render('admin/details', RecordDetails::make(
+            $newsArticle->localized('title'),
+            route('admin.news.index', ['locale' => app()->getLocale()]),
+            route('admin.news.edit', ['locale' => app()->getLocale(), 'newsArticle' => $newsArticle]),
+            [
+                RecordDetails::text('sector', $newsArticle->sector?->localized('name')),
+                RecordDetails::text('titleAr', $newsArticle->title_ar),
+                RecordDetails::text('titleEn', $newsArticle->title_en),
+                RecordDetails::text('summaryAr', $newsArticle->summary_ar),
+                RecordDetails::text('summaryEn', $newsArticle->summary_en),
+                RecordDetails::text('bodyAr', $newsArticle->body_ar),
+                RecordDetails::text('bodyEn', $newsArticle->body_en),
+                RecordDetails::code('scope', $newsArticle->scope->value),
+                RecordDetails::code('status', $newsArticle->status->value),
+                RecordDetails::code('origin', $newsArticle->origin->value),
+                RecordDetails::text('sourceName', $newsArticle->source_name),
+                RecordDetails::text('originalUrl', $newsArticle->original_url),
+                RecordDetails::image('photo', StoredImage::url($newsArticle->image_path)),
+                RecordDetails::date('publishedAt', $newsArticle->published_at?->toIso8601String()),
+            ],
+        ));
+    }
+
     public function edit(string $locale, NewsArticle $newsArticle, CatalogOptions $catalog): Response
     {
         return Inertia::render('admin/news/form', [
@@ -97,6 +133,7 @@ class NewsArticleController extends Controller
                 'original_url' => $newsArticle->original_url,
                 'published_at' => $newsArticle->published_at?->format('Y-m-d\TH:i'),
                 'origin' => $newsArticle->origin->value,
+                'image_url' => StoredImage::url($newsArticle->image_path),
             ],
             'sectors' => $catalog->sectors(),
             'submitUrl' => route('admin.news.update', [
@@ -146,6 +183,12 @@ class NewsArticleController extends Controller
             'original_url',
             'published_at',
         ]));
+        $article->image_path = StoredImage::replace(
+            $article->image_path,
+            $request->file('image'),
+            $request->boolean('remove_image'),
+            'news',
+        );
 
         if (in_array($article->status, [NewsStatus::Published, NewsStatus::Rejected], true)) {
             $article->reviewed_at = now();

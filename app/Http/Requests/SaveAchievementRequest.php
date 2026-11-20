@@ -17,6 +17,7 @@ class SaveAchievementRequest extends DirectorateFormRequest
             'summary_en' => ['required', 'string', 'max:2000'],
             'year' => ['required', 'integer', 'min:1990', 'max:2100'],
             'is_published' => ['required', 'boolean'],
+            ...$this->imageRules(),
         ];
     }
 }

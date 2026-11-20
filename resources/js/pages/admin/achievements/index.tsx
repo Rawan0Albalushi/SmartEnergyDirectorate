@@ -1,23 +1,29 @@
 import { Head } from '@inertiajs/react';
 import {
-    EditLink,
-    Meta,
+    ActionCell,
+    DataCell,
+    PhotoCell,
+    DataRow,
+    DataTable,
     PageIntro,
     PrimaryLink,
-    RecordList,
-    RecordRow,
-    Visibility,
+    RowAction,
+    StatusText,
 } from '@/components/admin/chrome';
 import { Pager } from '@/components/public/pager';
 import { useI18n } from '@/lib/i18n';
+import { listedPhoto, useHeroSrc } from '@/lib/media';
 import type { PageMeta } from '@/types/content';
 
 type Row = {
     id: number;
     title: string;
+    imageUrl: string | null;
+    sectorSlug: string | null;
     year: number;
     isPublished: boolean;
     sector: string;
+    showUrl: string;
     editUrl: string;
 };
 
@@ -29,6 +35,7 @@ export default function AchievementIndex({
     page: PageMeta;
 }) {
     const { t, locale } = useI18n();
+    const hero = useHeroSrc();
 
     return (
         <>
@@ -41,28 +48,53 @@ export default function AchievementIndex({
                     </PrimaryLink>
                 }
             />
-            <RecordList count={achievements.length} empty={t('emptyRecords')}>
+            <DataTable
+                label={t('achievements')}
+                count={achievements.length}
+                empty={t('emptyRecords')}
+                columns={[
+                    { key: 'photo', label: t('photo') },
+                    { key: 'title', label: t('title') },
+                    { key: 'sector', label: t('sector') },
+                    { key: 'year', label: t('year') },
+                    { key: 'visibility', label: t('visibility') },
+                    { key: 'actions', label: t('actions'), align: 'end' },
+                ]}
+            >
                 {achievements.map((item) => (
-                    <RecordRow key={item.id}>
-                        <span className="min-w-0">
-                            <span className="block text-base font-medium">
-                                {item.title}
-                            </span>
-                            <Meta
-                                parts={[String(item.year), item.sector || null]}
+                    <DataRow key={item.id}>
+                        <PhotoCell
+                            src={listedPhoto(
+                                item.imageUrl,
+                                item.sectorSlug,
+                                hero,
+                            )}
+                        />
+                        <DataCell primary>{item.title}</DataCell>
+                        <DataCell>{item.sector || '—'}</DataCell>
+                        <DataCell numeric>{item.year}</DataCell>
+                        <DataCell>
+                            <StatusText
+                                on={item.isPublished}
+                                onLabel={t('visible')}
+                                offLabel={t('hidden')}
                             />
-                        </span>
-                        <span className="flex items-center gap-4">
-                            <Visibility
-                                published={item.isPublished}
-                                visible={t('visible')}
-                                hidden={t('hidden')}
+                        </DataCell>
+                        <ActionCell>
+                            <RowAction
+                                kind="view"
+                                href={item.showUrl}
+                                label={t('view')}
                             />
-                            <EditLink href={item.editUrl}>{t('edit')}</EditLink>
-                        </span>
-                    </RecordRow>
+                            <RowAction
+                                kind="edit"
+                                href={item.editUrl}
+                                label={t('edit')}
+                            />
+                        </ActionCell>
+                    </DataRow>
                 ))}
-            </RecordList>
+            </DataTable>
             <Pager page={page} />
         </>
     );

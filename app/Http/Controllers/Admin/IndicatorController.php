@@ -7,6 +7,7 @@ use App\Http\Requests\SaveIndicatorRequest;
 use App\Models\Indicator;
 use App\Support\CatalogOptions;
 use App\Support\PageMeta;
+use App\Support\RecordDetails;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,6 +31,10 @@ class IndicatorController extends Controller
                 'period' => $indicator->period_label,
                 'isPublished' => $indicator->is_published,
                 'sector' => $indicator->sector?->localized('name') ?? '',
+                'showUrl' => route('admin.indicators.show', [
+                    'locale' => app()->getLocale(),
+                    'indicator' => $indicator,
+                ]),
                 'editUrl' => route('admin.indicators.edit', [
                     'locale' => app()->getLocale(),
                     'indicator' => $indicator,
@@ -58,6 +63,31 @@ class IndicatorController extends Controller
         return redirect()
             ->route('admin.indicators.index', ['locale' => app()->getLocale()])
             ->with('status', __('Saved.'));
+    }
+
+    public function show(string $locale, Indicator $indicator): Response
+    {
+        $indicator->load('sector');
+
+        return Inertia::render('admin/details', RecordDetails::make(
+            $indicator->localized('name'),
+            route('admin.indicators.index', ['locale' => app()->getLocale()]),
+            route('admin.indicators.edit', ['locale' => app()->getLocale(), 'indicator' => $indicator]),
+            [
+                RecordDetails::text('sector', $indicator->sector?->localized('name')),
+                RecordDetails::text('nameAr', $indicator->name_ar),
+                RecordDetails::text('nameEn', $indicator->name_en),
+                RecordDetails::text('value', $indicator->value),
+                RecordDetails::text('unitAr', $indicator->unit_ar),
+                RecordDetails::text('unitEn', $indicator->unit_en),
+                RecordDetails::text('periodLabel', $indicator->period_label),
+                RecordDetails::date('recordedOn', $indicator->recorded_on->toDateString()),
+                RecordDetails::text('notesAr', $indicator->notes_ar),
+                RecordDetails::text('notesEn', $indicator->notes_en),
+                RecordDetails::flag('visibility', $indicator->is_published, 'visibility'),
+                RecordDetails::text('sortOrder', $indicator->sort_order),
+            ],
+        ));
     }
 
     public function edit(string $locale, Indicator $indicator, CatalogOptions $catalog): Response

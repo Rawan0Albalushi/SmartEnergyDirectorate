@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasLocalizedText;
+use App\Models\Concerns\HasStoredImage;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $summary_en
  * @property int $year
  * @property bool $is_published
+ * @property string|null $image_path
  * @property Sector|null $sector
  */
 #[Fillable([
@@ -32,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Achievement extends Model
 {
     use HasLocalizedText;
+    use HasStoredImage;
 
     /**
      * @return array<string, string>
@@ -67,7 +70,8 @@ class Achievement extends Model
      *     title: string,
      *     summary: string,
      *     year: int,
-     *     sector: array{slug: string, name: string}|null
+     *     sector: array{slug: string, name: string}|null,
+     *     imageUrl: ?string
      * }
      */
     public function toPublicArray(): array
@@ -77,6 +81,7 @@ class Achievement extends Model
             'title' => $this->localized('title'),
             'summary' => $this->localized('summary'),
             'year' => $this->year,
+            'imageUrl' => $this->storedImageUrl(),
             'sector' => $this->relationLoaded('sector') && $this->sector !== null
                 ? [
                     'slug' => $this->sector->slug,

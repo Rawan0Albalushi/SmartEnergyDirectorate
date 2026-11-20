@@ -6,6 +6,7 @@ import {
     RecordForm,
     TextField,
 } from '@/components/admin/fields';
+import { ImageField } from '@/components/admin/image-field';
 import { useI18n } from '@/lib/i18n';
 
 type SectorFormData = {
@@ -16,6 +17,7 @@ type SectorFormData = {
     body_ar: string | null;
     body_en: string | null;
     sort_order: number;
+    image_url: string | null;
 };
 
 export default function SectorForm({
@@ -34,11 +36,18 @@ export default function SectorForm({
         body_ar: sector.body_ar ?? '',
         body_en: sector.body_en ?? '',
         sort_order: String(sector.sort_order),
+        image: null as File | null,
+        remove_image: false,
     });
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        form.put(submitUrl);
+        form.transform((data) => ({
+            ...data,
+            image: data.image ?? '',
+            remove_image: data.remove_image ? '1' : '0',
+        }));
+        form.put(submitUrl, { forceFormData: true });
     }
 
     return (
@@ -103,6 +112,21 @@ export default function SectorForm({
                         onChange={(value) => form.setData('body_en', value)}
                     />
                 </FieldPair>
+                <ImageField
+                    label={t('photo')}
+                    hint={t('imageHint')}
+                    currentUrl={sector.image_url}
+                    remove={form.data.remove_image}
+                    error={form.errors.image}
+                    onFile={(file) =>
+                        form.setData({
+                            ...form.data,
+                            image: file,
+                            remove_image: file ? false : form.data.remove_image,
+                        })
+                    }
+                    onRemove={(remove) => form.setData('remove_image', remove)}
+                />
                 <TextField
                     id="sort_order"
                     label={t('sortOrder')}

@@ -7,8 +7,9 @@ use App\Http\Requests\SaveStaffMemberRequest;
 use App\Models\StaffMember;
 use App\Support\CatalogOptions;
 use App\Support\PageMeta;
+use App\Support\RecordDetails;
+use App\Support\StoredImage;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,10 +26,15 @@ class StaffMemberController extends Controller
         return Inertia::render('admin/staff/index', [
             'staff' => $staff->getCollection()->map(fn (StaffMember $member): array => [
                 'name' => $member->localized('name'),
+                'imageUrl' => StoredImage::url($member->photo_path),
                 'title' => $member->localized('title'),
                 'department' => $member->department?->localized('name') ?? '',
                 'roster' => $member->roster->value,
                 'isPublished' => $member->is_published,
+                'showUrl' => route('admin.staff.show', [
+                    'locale' => app()->getLocale(),
+                    'staffMember' => $member,
+                ]),
                 'editUrl' => route('admin.staff.edit', [
                     'locale' => app()->getLocale(),
                     'staffMember' => $member,
@@ -59,6 +65,30 @@ class StaffMemberController extends Controller
             ->with('status', __('Saved.'));
     }
 
+    public function show(string $locale, StaffMember $staffMember): Response
+    {
+        $staffMember->load('department');
+
+        return Inertia::render('admin/details', RecordDetails::make(
+            $staffMember->localized('name'),
+            route('admin.staff.index', ['locale' => app()->getLocale()]),
+            route('admin.staff.edit', ['locale' => app()->getLocale(), 'staffMember' => $staffMember]),
+            [
+                RecordDetails::text('department', $staffMember->department?->localized('name')),
+                RecordDetails::text('nameAr', $staffMember->name_ar),
+                RecordDetails::text('nameEn', $staffMember->name_en),
+                RecordDetails::text('jobTitleAr', $staffMember->title_ar),
+                RecordDetails::text('jobTitleEn', $staffMember->title_en),
+                RecordDetails::text('bioAr', $staffMember->bio_ar),
+                RecordDetails::text('bioEn', $staffMember->bio_en),
+                RecordDetails::text('email', $staffMember->email),
+                RecordDetails::code('roster', $staffMember->roster->value),
+                RecordDetails::flag('visibility', $staffMember->is_published, 'visibility'),
+                RecordDetails::text('sortOrder', $staffMember->sort_order),
+            ],
+        ));
+    }
+
     public function edit(string $locale, StaffMember $staffMember, CatalogOptions $catalog): Response
     {
         return Inertia::render('admin/staff/form', [
@@ -72,9 +102,7 @@ class StaffMemberController extends Controller
                 'bio_en' => $staffMember->bio_en ?? '',
                 'email' => $staffMember->email,
                 'roster' => $staffMember->roster->value,
-                'photo_url' => is_string($staffMember->photo_path) && $staffMember->photo_path !== ''
-                    ? Storage::disk('public')->url($staffMember->photo_path)
-                    : null,
+                'photo_url' => StoredImage::url($staffMember->photo_path),
                 'is_published' => $staffMember->is_published,
                 'sort_order' => $staffMember->sort_order,
             ],
@@ -130,21 +158,11 @@ class StaffMemberController extends Controller
 
     private function storePhoto(SaveStaffMemberRequest $request, StaffMember $member): void
     {
-        if (! $request->hasFile('photo') && ! $request->boolean('remove_photo')) {
-            return;
-        }
-
-        $previous = $member->photo_path;
-
-        if ($request->hasFile('photo')) {
-            $stored = $request->file('photo')?->store('staff', 'public');
-            $member->photo_path = is_string($stored) ? $stored : $previous;
-        } else {
-            $member->photo_path = null;
-        }
-
-        if (is_string($previous) && $previous !== '' && $previous !== $member->photo_path) {
-            Storage::disk('public')->delete($previous);
-        }
+        $member->photo_path = StoredImage::replace(
+            $member->photo_path,
+            $request->file('photo'),
+            $request->boolean('remove_photo'),
+            'staff',
+        );
     }
 }
