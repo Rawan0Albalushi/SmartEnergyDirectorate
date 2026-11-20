@@ -9,6 +9,7 @@ import {
 } from '@/components/admin/fields';
 import { ImageField } from '@/components/admin/image-field';
 import { useI18n } from '@/lib/i18n';
+import { submitWithFiles } from '@/lib/submit-files';
 import type { Option } from '@/types/content';
 
 type ArticleFormData = {
@@ -61,18 +62,11 @@ export default function NewsForm({
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        form.transform((data) => ({
+        submitWithFiles(form, submitUrl, method, (data) => ({
             ...data,
             image: data.image ?? '',
             remove_image: data.remove_image ? '1' : '0',
         }));
-        const options = { forceFormData: true };
-
-        if (method === 'post') {
-            form.post(submitUrl, options);
-        } else {
-            form.put(submitUrl, options);
-        }
     }
 
     return (

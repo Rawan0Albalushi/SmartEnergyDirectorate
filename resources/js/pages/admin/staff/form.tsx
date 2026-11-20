@@ -8,6 +8,7 @@ import {
     TextField,
 } from '@/components/admin/fields';
 import { useI18n } from '@/lib/i18n';
+import { submitWithFiles } from '@/lib/submit-files';
 import type { Option } from '@/types/content';
 
 type StaffFormData = {
@@ -59,19 +60,11 @@ export default function StaffForm({
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        form.transform((data) => ({
+        submitWithFiles(form, submitUrl, method, (data) => ({
             ...data,
             photo: data.photo ?? '',
             remove_photo: data.remove_photo ? '1' : '0',
         }));
-
-        const options = { forceFormData: true };
-
-        if (method === 'post') {
-            form.post(submitUrl, options);
-        } else {
-            form.put(submitUrl, options);
-        }
     }
 
     return (

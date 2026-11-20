@@ -8,6 +8,7 @@ import {
 } from '@/components/admin/fields';
 import { ImageField } from '@/components/admin/image-field';
 import { useI18n } from '@/lib/i18n';
+import { submitWithFiles } from '@/lib/submit-files';
 
 type SectorFormData = {
     name_ar: string;
@@ -42,12 +43,11 @@ export default function SectorForm({
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        form.transform((data) => ({
+        submitWithFiles(form, submitUrl, 'put', (data) => ({
             ...data,
             image: data.image ?? '',
             remove_image: data.remove_image ? '1' : '0',
         }));
-        form.put(submitUrl, { forceFormData: true });
     }
 
     return (

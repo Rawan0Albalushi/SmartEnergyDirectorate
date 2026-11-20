@@ -79,6 +79,46 @@ class StaffProfileTest extends TestCase
             ->assertSee('storage\\/staff\\/', false);
     }
 
+    public function test_an_editor_can_update_a_profile_with_a_file_field_present(): void
+    {
+        Storage::fake('public');
+        $department = $this->department();
+        $editor = User::factory()->create();
+        $member = StaffMember::query()->create([
+            'department_id' => $department->id,
+            'roster' => StaffRoster::Staff,
+            'name_ar' => 'ليلى الحسن',
+            'name_en' => 'Layla Al Hasan',
+            'title_ar' => 'رئيسة القسم',
+            'title_en' => 'Head of section',
+            'is_published' => true,
+            'sort_order' => 1,
+        ]);
+
+        $this->actingAs($editor)
+            ->post(route('admin.staff.update', ['locale' => 'ar', 'staffMember' => $member]), [
+                '_method' => 'put',
+                'department_id' => $department->id,
+                'roster' => 'staff',
+                'name_ar' => 'ليلى الحسن',
+                'name_en' => 'Layla Al Hasan',
+                'title_ar' => 'رئيسة القسم',
+                'title_en' => 'Head of section',
+                'bio_ar' => '',
+                'bio_en' => '',
+                'email' => '',
+                'photo' => '',
+                'remove_photo' => '0',
+                'is_published' => '1',
+                'sort_order' => '1',
+            ])
+            ->assertRedirect(route('admin.staff.index', ['locale' => 'ar']));
+
+        $member->refresh();
+        $this->assertSame('Layla Al Hasan', $member->name_en);
+        $this->assertNull($member->photo_path);
+    }
+
     private function department(): Department
     {
         return Department::query()->create([
