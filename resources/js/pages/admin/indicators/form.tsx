@@ -1,6 +1,12 @@
 import { Head, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
-import { DeleteControl, RecordForm, SelectField, TextField, AreaField } from '@/components/admin/fields';
+import {
+    AreaField,
+    FieldPair,
+    RecordForm,
+    SelectField,
+    TextField,
+} from '@/components/admin/fields';
 import { useI18n } from '@/lib/i18n';
 import type { Option } from '@/types/content';
 
@@ -67,21 +73,125 @@ export default function IndicatorForm({
                 processing={form.processing}
                 onSubmit={submit}
                 cancelHref={`/${locale}/admin/indicators`}
+                deleteUrl={deleteUrl}
             >
-                <SelectField id="sector_id" label={t('sector')} value={form.data.sector_id} error={form.errors.sector_id} onChange={(value) => form.setData('sector_id', value)} options={sectors.map((sector) => ({ value: String(sector.id), label: sector.name }))} />
-                <TextField id="name_ar" label={t('nameAr')} value={form.data.name_ar} error={form.errors.name_ar} onChange={(value) => form.setData('name_ar', value)} required />
-                <TextField id="name_en" label={t('nameEn')} value={form.data.name_en} error={form.errors.name_en} onChange={(value) => form.setData('name_en', value)} required />
-                <TextField id="value" label={t('value')} type="number" value={form.data.value} error={form.errors.value} onChange={(value) => form.setData('value', value)} required />
-                <TextField id="unit_ar" label={t('unitAr')} value={form.data.unit_ar} error={form.errors.unit_ar} onChange={(value) => form.setData('unit_ar', value)} required />
-                <TextField id="unit_en" label={t('unitEn')} value={form.data.unit_en} error={form.errors.unit_en} onChange={(value) => form.setData('unit_en', value)} required />
-                <TextField id="period_label" label={t('periodLabel')} value={form.data.period_label} error={form.errors.period_label} onChange={(value) => form.setData('period_label', value)} required />
-                <TextField id="recorded_on" label={t('readingDate')} type="date" value={form.data.recorded_on} error={form.errors.recorded_on} onChange={(value) => form.setData('recorded_on', value)} required />
-                <AreaField id="notes_ar" label={t('notesAr')} value={form.data.notes_ar} error={form.errors.notes_ar} onChange={(value) => form.setData('notes_ar', value)} />
-                <AreaField id="notes_en" label={t('notesEn')} value={form.data.notes_en} error={form.errors.notes_en} onChange={(value) => form.setData('notes_en', value)} />
-                <SelectField id="is_published" label={t('visibility')} value={form.data.is_published} error={form.errors.is_published} onChange={(value) => form.setData('is_published', value)} options={[{ value: '1', label: t('visible') }, { value: '0', label: t('hidden') }]} />
-                <TextField id="sort_order" label={t('sortOrder')} type="number" value={form.data.sort_order} error={form.errors.sort_order} onChange={(value) => form.setData('sort_order', value)} />
+                <SelectField
+                    id="sector_id"
+                    label={t('sector')}
+                    value={form.data.sector_id}
+                    error={form.errors.sector_id}
+                    onChange={(value) => form.setData('sector_id', value)}
+                    options={sectors.map((sector) => ({
+                        value: String(sector.id),
+                        label: sector.name,
+                    }))}
+                />
+                <FieldPair>
+                    <TextField
+                        id="name_ar"
+                        label={t('nameAr')}
+                        value={form.data.name_ar}
+                        error={form.errors.name_ar}
+                        onChange={(value) => form.setData('name_ar', value)}
+                        required
+                    />
+                    <TextField
+                        id="name_en"
+                        label={t('nameEn')}
+                        value={form.data.name_en}
+                        error={form.errors.name_en}
+                        onChange={(value) => form.setData('name_en', value)}
+                        required
+                    />
+                </FieldPair>
+                <TextField
+                    id="value"
+                    label={t('value')}
+                    type="number"
+                    value={form.data.value}
+                    error={form.errors.value}
+                    onChange={(value) => form.setData('value', value)}
+                    required
+                />
+                <FieldPair>
+                    <TextField
+                        id="unit_ar"
+                        label={t('unitAr')}
+                        value={form.data.unit_ar}
+                        error={form.errors.unit_ar}
+                        onChange={(value) => form.setData('unit_ar', value)}
+                        required
+                    />
+                    <TextField
+                        id="unit_en"
+                        label={t('unitEn')}
+                        value={form.data.unit_en}
+                        error={form.errors.unit_en}
+                        onChange={(value) => form.setData('unit_en', value)}
+                        required
+                    />
+                </FieldPair>
+                <FieldPair>
+                    <TextField
+                        id="period_label"
+                        label={t('periodLabel')}
+                        value={form.data.period_label}
+                        error={form.errors.period_label}
+                        onChange={(value) =>
+                            form.setData('period_label', value)
+                        }
+                        required
+                    />
+                    <TextField
+                        id="recorded_on"
+                        label={t('readingDate')}
+                        type="date"
+                        value={form.data.recorded_on}
+                        error={form.errors.recorded_on}
+                        onChange={(value) => form.setData('recorded_on', value)}
+                        required
+                    />
+                </FieldPair>
+                <FieldPair>
+                    <AreaField
+                        id="notes_ar"
+                        label={t('notesAr')}
+                        value={form.data.notes_ar}
+                        error={form.errors.notes_ar}
+                        onChange={(value) => form.setData('notes_ar', value)}
+                    />
+                    <AreaField
+                        id="notes_en"
+                        label={t('notesEn')}
+                        value={form.data.notes_en}
+                        error={form.errors.notes_en}
+                        onChange={(value) => form.setData('notes_en', value)}
+                    />
+                </FieldPair>
+                <FieldPair>
+                    <SelectField
+                        id="is_published"
+                        label={t('visibility')}
+                        value={form.data.is_published}
+                        error={form.errors.is_published}
+                        onChange={(value) =>
+                            form.setData('is_published', value)
+                        }
+                        options={[
+                            { value: '1', label: t('visible') },
+                            { value: '0', label: t('hidden') },
+                        ]}
+                    />
+                    <TextField
+                        id="sort_order"
+                        label={t('sortOrder')}
+                        type="number"
+                        value={form.data.sort_order}
+                        error={form.errors.sort_order}
+                        onChange={(value) => form.setData('sort_order', value)}
+                    />
+                </FieldPair>
             </RecordForm>
-            {deleteUrl ? <div className="mt-6"><DeleteControl url={deleteUrl} /></div> : null}
         </>
     );
 }

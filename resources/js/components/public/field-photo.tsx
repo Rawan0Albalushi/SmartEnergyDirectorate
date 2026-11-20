@@ -8,7 +8,13 @@ type Props = {
     priority?: boolean;
 };
 
-export function FieldPhoto({ slug, horizon: wide, alt, className, priority = false }: Props) {
+export function FieldPhoto({
+    slug,
+    horizon: wide,
+    alt,
+    className,
+    priority = false,
+}: Props) {
     const plate = wide ? horizon : fieldPlate(slug);
 
     if (!plate) {

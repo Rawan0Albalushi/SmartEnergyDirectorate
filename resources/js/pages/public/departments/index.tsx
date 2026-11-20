@@ -10,7 +10,10 @@ import type { DepartmentSummary, StaffPublic } from '@/types/content';
 
 type Roster = 'staff' | 'board' | null;
 
-const views: Record<'sections' | 'staff' | 'board', { title: TranslationKey; lede: TranslationKey }> = {
+const views: Record<
+    'sections' | 'staff' | 'board',
+    { title: TranslationKey; lede: TranslationKey }
+> = {
     sections: { title: 'departments', lede: 'departmentsIntro' },
     staff: { title: 'staff', lede: 'staffIntro' },
     board: { title: 'board', lede: 'boardIntro' },
@@ -38,27 +41,46 @@ export default function DepartmentsIndex({
                     className="grid overflow-hidden rounded-[1.25rem] border border-line bg-white sm:grid-cols-3 [&>*+*]:border-t sm:[&>*+*]:border-s sm:[&>*+*]:border-t-0"
                     aria-label={t('peopleNav')}
                 >
-                    <RosterTab href={`/${locale}/departments`} current={view === 'sections'}>
+                    <RosterTab
+                        href={`/${locale}/departments`}
+                        current={view === 'sections'}
+                    >
                         {t('departments')}
                     </RosterTab>
-                    <RosterTab href={`/${locale}/departments?roster=board`} current={view === 'board'}>
+                    <RosterTab
+                        href={`/${locale}/departments?roster=board`}
+                        current={view === 'board'}
+                    >
                         {t('board')}
                     </RosterTab>
-                    <RosterTab href={`/${locale}/departments?roster=staff`} current={view === 'staff'}>
+                    <RosterTab
+                        href={`/${locale}/departments?roster=staff`}
+                        current={view === 'staff'}
+                    >
                         {t('staff')}
                     </RosterTab>
                 </nav>
 
                 {view === 'sections' ? (
                     departments.length === 0 ? (
-                        <p className="mt-6 text-sm text-[#3E534C]">{t('emptyDepartments')}</p>
+                        <p className="mt-6 text-sm text-[#3E534C]">
+                            {t('emptyDepartments')}
+                        </p>
                     ) : (
                         <ol className="mt-6 grid list-none gap-5 p-0 sm:grid-cols-2 xl:grid-cols-3">
                             {departments.map((department, index) => {
-                                const plate = departmentPlates[department.slug] ?? { src: horizon.src, position: 'object-center' };
+                                const plate = departmentPlates[
+                                    department.slug
+                                ] ?? {
+                                    src: horizon.src,
+                                    position: 'object-center',
+                                };
 
                                 return (
-                                    <li key={department.slug} className="min-w-0">
+                                    <li
+                                        key={department.slug}
+                                        className="min-w-0"
+                                    >
                                         <PortraitCard
                                             href={`/${locale}/departments/${department.slug}`}
                                             src={plate.src}
@@ -73,7 +95,9 @@ export default function DepartmentsIndex({
                         </ol>
                     )
                 ) : people.length === 0 ? (
-                    <p className="mt-6 text-sm text-[#3E534C]">{view === 'board' ? t('emptyBoard') : t('emptyPeople')}</p>
+                    <p className="mt-6 text-sm text-[#3E534C]">
+                        {view === 'board' ? t('emptyBoard') : t('emptyPeople')}
+                    </p>
                 ) : (
                     <div className="mt-6">
                         <PersonGallery people={people} />
@@ -84,7 +108,15 @@ export default function DepartmentsIndex({
     );
 }
 
-function RosterTab({ href, current, children }: { href: string; current: boolean; children: string }) {
+function RosterTab({
+    href,
+    current,
+    children,
+}: {
+    href: string;
+    current: boolean;
+    children: string;
+}) {
     return (
         <Link
             href={href}

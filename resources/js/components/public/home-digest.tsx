@@ -1,7 +1,14 @@
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+    useEffect,
+    useRef,
+    useState,
+    type CSSProperties,
+    type ReactNode,
+} from 'react';
 import { NewsCover } from '@/components/public/news-cover';
+import { SectionHeading } from '@/components/public/section-heading';
 import { useI18n } from '@/lib/i18n';
 import type { NewsSummary } from '@/types/content';
 
@@ -12,29 +19,39 @@ export function HomeDigest({ news }: { news: NewsSummary[] }) {
     const { t, locale, dir } = useI18n();
 
     return (
-        <section className="mx-auto max-w-[90rem] px-4 py-10 sm:px-6 lg:px-6 lg:py-14" aria-labelledby="home-news">
+        <section
+            className="mx-auto max-w-[90rem] px-4 py-10 sm:px-6 lg:px-6 lg:py-14"
+            aria-labelledby="home-news"
+        >
             <div className="flex flex-wrap items-end justify-between gap-4">
-                <div className="min-w-0">
-                    <h2 id="home-news" className="flex items-center gap-2 text-2xl font-medium text-deep sm:text-3xl">
-                        <span className="h-7 w-1 shrink-0 rounded-full bg-deep" aria-hidden="true" />
-                        {t('newsHeading')}
-                    </h2>
-                    <p className="mt-2 max-w-xl text-sm leading-7 text-[#3E534C] sm:text-base">{t('newsHomeLede')}</p>
-                </div>
+                <SectionHeading
+                    id="home-news"
+                    title={t('newsHeading')}
+                    lede={t('newsHomeLede')}
+                />
                 <Link
                     href={`/${locale}/news`}
                     className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-white ps-4 pe-1.5 text-sm text-ink"
                 >
                     {t('allNews')}
                     <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#e7f1ee] text-deep">
-                        <ArrowLeft className="size-4 ltr:scale-x-[-1]" aria-hidden="true" />
+                        <ArrowLeft
+                            className="size-4 ltr:scale-x-[-1]"
+                            aria-hidden="true"
+                        />
                     </span>
                 </Link>
             </div>
             {news.length === 0 ? (
                 <p className="mt-8 text-sm text-[#3E534C]">{t('emptyNews')}</p>
             ) : (
-                <NewsStrip news={news} dir={dir} label={t('newsHeading')} previousLabel={t('previous')} nextLabel={t('next')} />
+                <NewsStrip
+                    news={news}
+                    dir={dir}
+                    label={t('newsHeading')}
+                    previousLabel={t('previous')}
+                    nextLabel={t('next')}
+                />
             )}
         </section>
     );
@@ -100,20 +117,28 @@ function NewsStrip({
     }
 
     const gapPx = gap * 16;
-    const columns = width > 0 && width < 640 ? 1 : width > 0 && width < 1024 ? 2 : 3;
-    const fitted = width === 0 ? cardWidth * 16 : (width - gapPx * (columns - 1)) / columns;
+    const columns =
+        width > 0 && width < 640 ? 1 : width > 0 && width < 1024 ? 2 : 3;
+    const fitted =
+        width === 0
+            ? cardWidth * 16
+            : (width - gapPx * (columns - 1)) / columns;
     const visible = columns;
     const pages = Math.max(1, Math.ceil(news.length / visible));
     const current = Math.min(page, pages - 1);
     const stride = visible * (fitted + gapPx);
-    const maxShift = Math.max(0, news.length * fitted + (news.length - 1) * gapPx - width);
+    const maxShift = Math.max(
+        0,
+        news.length * fitted + (news.length - 1) * gapPx - width,
+    );
     const shift = Math.min(current * stride, maxShift);
     const sign = dir === 'rtl' ? 1 : -1;
     const PreviousIcon = dir === 'rtl' ? ChevronRight : ChevronLeft;
     const NextIcon = dir === 'rtl' ? ChevronLeft : ChevronRight;
 
     const loopPx = news.length * (fitted + gapPx);
-    const marquee = news.length > 3 && width > 0 && loopPx > width && !reduceMotion;
+    const marquee =
+        news.length > 3 && width > 0 && loopPx > width && !reduceMotion;
 
     function go(next: number) {
         setPage(Math.min(Math.max(next, 0), pages - 1));
@@ -142,7 +167,10 @@ function NewsStrip({
             onBlurCapture={(event) => {
                 const next = event.relatedTarget;
 
-                if (!(next instanceof Node) || !event.currentTarget.contains(next)) {
+                if (
+                    !(next instanceof Node) ||
+                    !event.currentTarget.contains(next)
+                ) {
                     focusInside.current = false;
                     syncHold();
                 }
@@ -187,23 +215,52 @@ function NewsStrip({
             >
                 <ul
                     className={`flex ${marquee ? 'news-marquee' : 'transition-transform duration-700 ease-out motion-reduce:transition-none'}`}
-                    style={{
-                        gap: `${gap}rem`,
-                        '--news-loop': `${loopPx}px`,
-                        animationDuration: marquee ? `${loopPx / 64}s` : undefined,
-                        animationPlayState: held || hidden ? 'paused' : 'running',
-                        transform: marquee || width === 0 ? undefined : `translateX(${sign * shift}px)`,
-                    }}
+                    style={
+                        {
+                            gap: `${gap}rem`,
+                            '--news-loop': `${loopPx}px`,
+                            animationDuration: marquee
+                                ? `${loopPx / 64}s`
+                                : undefined,
+                            animationPlayState:
+                                held || hidden ? 'paused' : 'running',
+                            transform:
+                                marquee || width === 0
+                                    ? undefined
+                                    : `translateX(${sign * shift}px)`,
+                        } as CSSProperties
+                    }
                 >
                     {news.map((article) => (
-                        <li key={article.slug} className="shrink-0" style={{ width: width === 0 ? `${cardWidth}rem` : `${fitted}px` }}>
-                            <NewsCover article={article} className="h-[21rem]" />
+                        <li
+                            key={article.slug}
+                            className="shrink-0"
+                            style={{
+                                width:
+                                    width === 0
+                                        ? `${cardWidth}rem`
+                                        : `${fitted}px`,
+                            }}
+                        >
+                            <NewsCover
+                                article={article}
+                                className="h-[21rem]"
+                            />
                         </li>
                     ))}
                     {marquee
                         ? news.map((article) => (
-                              <li key={`${article.slug}-loop`} className="shrink-0" aria-hidden="true" style={{ width: `${fitted}px` }}>
-                                  <NewsCover article={article} className="h-[21rem]" tabIndex={-1} />
+                              <li
+                                  key={`${article.slug}-loop`}
+                                  className="shrink-0"
+                                  aria-hidden="true"
+                                  style={{ width: `${fitted}px` }}
+                              >
+                                  <NewsCover
+                                      article={article}
+                                      className="h-[21rem]"
+                                      tabIndex={-1}
+                                  />
                               </li>
                           ))
                         : null}
@@ -211,26 +268,44 @@ function NewsStrip({
             </div>
             {!marquee && pages > 1 ? (
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-                    <StripButton label={previousLabel} disabled={current === 0} onClick={() => go(current - 1)}>
+                    <StripButton
+                        label={previousLabel}
+                        disabled={current === 0}
+                        onClick={() => go(current - 1)}
+                    >
                         <PreviousIcon className="size-4" aria-hidden="true" />
                     </StripButton>
-                    <div className="flex items-center gap-2" role="group" aria-label={label}>
+                    <div
+                        className="flex items-center gap-2"
+                        role="group"
+                        aria-label={label}
+                    >
                         {Array.from({ length: pages }, (_, index) => (
                             <button
                                 key={index}
                                 type="button"
-                                aria-current={index === current ? 'true' : undefined}
+                                aria-current={
+                                    index === current ? 'true' : undefined
+                                }
                                 aria-label={`${label} ${index + 1}`}
                                 onClick={() => go(index)}
                                 className="inline-flex size-11 items-center justify-center"
                             >
                                 <span
-                                    className={index === current ? 'size-3 rounded-full bg-deep' : 'size-3 rounded-full bg-[#c5d5cf]'}
+                                    className={
+                                        index === current
+                                            ? 'size-3 rounded-full bg-deep'
+                                            : 'size-3 rounded-full bg-[#c5d5cf]'
+                                    }
                                 />
                             </button>
                         ))}
                     </div>
-                    <StripButton label={nextLabel} disabled={current === pages - 1} onClick={() => go(current + 1)}>
+                    <StripButton
+                        label={nextLabel}
+                        disabled={current === pages - 1}
+                        onClick={() => go(current + 1)}
+                    >
                         <NextIcon className="size-4" aria-hidden="true" />
                     </StripButton>
                 </div>

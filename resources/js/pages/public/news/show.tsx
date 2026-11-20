@@ -14,15 +14,25 @@ export default function NewsShow({ article }: { article: NewsDetail }) {
             <Head title={article.title} />
             <PageIntro title={article.title} lede={article.summary}>
                 <BandChip>
-                    <time dateTime={article.publishedAt ?? undefined}>{formatDate(article.publishedAt, locale)}</time>
+                    <time dateTime={article.publishedAt ?? undefined}>
+                        {formatDate(article.publishedAt, locale)}
+                    </time>
                 </BandChip>
                 <BandChip>{label(locale, article.scope)}</BandChip>
             </PageIntro>
             <PageBody>
-                {article.body ? <p className="max-w-3xl text-base leading-8">{article.body}</p> : null}
+                {article.body ? (
+                    <p className="max-w-3xl text-base leading-8">
+                        {article.body}
+                    </p>
+                ) : null}
                 {article.sector ? (
                     <p className={article.body ? 'mt-8' : ''}>
-                        <ForwardLink href={`/${locale}/sectors#${article.sector.slug}`}>{article.sector.name}</ForwardLink>
+                        <ForwardLink
+                            href={`/${locale}/sectors#${article.sector.slug}`}
+                        >
+                            {article.sector.name}
+                        </ForwardLink>
                     </p>
                 ) : null}
                 {article.sourceName || article.originalUrl ? (
@@ -32,7 +42,9 @@ export default function NewsShow({ article }: { article: NewsDetail }) {
                         {article.sourceName ? (
                             <p className="text-sm text-[#3E534C]">
                                 <span className="text-ink">{t('source')}</span>
-                                <span className="ms-2">{article.sourceName}</span>
+                                <span className="ms-2">
+                                    {article.sourceName}
+                                </span>
                             </p>
                         ) : null}
                         {article.originalUrl ? (
@@ -43,7 +55,10 @@ export default function NewsShow({ article }: { article: NewsDetail }) {
                                 target="_blank"
                             >
                                 {t('originalSource')}
-                                <ExternalLink className="size-3.5" aria-hidden="true" />
+                                <ExternalLink
+                                    className="size-3.5"
+                                    aria-hidden="true"
+                                />
                             </a>
                         ) : null}
                     </div>

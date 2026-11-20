@@ -3,7 +3,11 @@ import { SiteFooter } from '@/components/public/site-footer';
 import { SiteHeader } from '@/components/public/site-header';
 import { useI18n } from '@/lib/i18n';
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default function PublicLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     const { locale, t } = useI18n();
 
     return (

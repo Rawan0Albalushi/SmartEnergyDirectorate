@@ -18,7 +18,11 @@ export function PortraitCard({
     return (
         <Link href={href} className="portrait-card">
             <span className="portrait-card__media">
-                <img src={src} alt="" className={`portrait-card__img ${position}`} />
+                <img
+                    src={src}
+                    alt=""
+                    className={`portrait-card__img ${position}`}
+                />
             </span>
             <span className="portrait-card__scrim" aria-hidden="true" />
             <span className="portrait-card__glass" aria-hidden="true" />

@@ -29,7 +29,9 @@ export default function Login({ status }: Props) {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">{t('emailAddress')}</Label>
+                                <Label htmlFor="email">
+                                    {t('emailAddress')}
+                                </Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -44,7 +46,9 @@ export default function Login({ status }: Props) {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">{t('password')}</Label>
+                                <Label htmlFor="password">
+                                    {t('password')}
+                                </Label>
                                 <PasswordInput
                                     id="password"
                                     name="password"
@@ -62,7 +66,9 @@ export default function Login({ status }: Props) {
                                     name="remember"
                                     tabIndex={3}
                                 />
-                                <Label htmlFor="remember">{t('remember')}</Label>
+                                <Label htmlFor="remember">
+                                    {t('remember')}
+                                </Label>
                             </div>
 
                             <Button

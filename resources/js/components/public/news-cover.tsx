@@ -29,10 +29,17 @@ export function NewsCover({
                 aria-hidden="true"
             />
             <span className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-2 p-4 text-white sm:p-5">
-                <time className="text-sm" dateTime={article.publishedAt ?? undefined}>
+                <time
+                    className="text-sm"
+                    dateTime={article.publishedAt ?? undefined}
+                >
                     {formatDate(article.publishedAt, locale)}
                 </time>
-                <span className={`line-clamp-2 font-medium leading-snug ${titleClassName}`}>{article.title}</span>
+                <span
+                    className={`line-clamp-2 leading-snug font-medium ${titleClassName}`}
+                >
+                    {article.title}
+                </span>
             </span>
         </Link>
     );

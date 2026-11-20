@@ -1,6 +1,12 @@
 import { ArrowUpRight, X } from 'lucide-react';
 import { useState } from 'react';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { useI18n } from '@/lib/i18n';
 import type { StaffPublic } from '@/types/content';
 
@@ -26,10 +32,17 @@ export function PersonGallery({ people }: { people: StaffPublic[] }) {
                             <PersonPhoto person={person} />
                             <span className="person-card__band">
                                 <span className="min-w-0 flex-1">
-                                    <span className="block text-lg font-medium leading-7 text-ink">{person.name}</span>
-                                    <span className="mt-0.5 block text-sm leading-6 text-[#3E534C]">{person.title}</span>
+                                    <span className="block text-lg leading-7 font-medium text-ink">
+                                        {person.name}
+                                    </span>
+                                    <span className="mt-0.5 block text-sm leading-6 text-[#3E534C]">
+                                        {person.title}
+                                    </span>
                                 </span>
-                                <span className="person-card__more" aria-hidden="true">
+                                <span
+                                    className="person-card__more"
+                                    aria-hidden="true"
+                                >
                                     <ArrowUpRight className="size-5 rtl:-scale-x-100" />
                                 </span>
                             </span>
@@ -41,7 +54,12 @@ export function PersonGallery({ people }: { people: StaffPublic[] }) {
 
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="max-h-[min(92dvh,46rem)] gap-0 overflow-hidden border-line bg-white p-0 sm:max-w-4xl [&>button.absolute]:hidden">
-                    {selected ? <PersonProfile person={selected} closeLabel={t('close')} /> : null}
+                    {selected ? (
+                        <PersonProfile
+                            person={selected}
+                            closeLabel={t('close')}
+                        />
+                    ) : null}
                 </DialogContent>
             </Dialog>
         </>
@@ -50,17 +68,28 @@ export function PersonGallery({ people }: { people: StaffPublic[] }) {
 
 function PersonPhoto({ person }: { person: StaffPublic }) {
     if (person.photoUrl) {
-        return <img src={person.photoUrl} alt="" className="person-card__photo" />;
+        return (
+            <img src={person.photoUrl} alt="" className="person-card__photo" />
+        );
     }
 
     return (
-        <span className="person-card__photo person-card__mark" aria-hidden="true">
+        <span
+            className="person-card__photo person-card__mark"
+            aria-hidden="true"
+        >
             {initials(person.name)}
         </span>
     );
 }
 
-function PersonProfile({ person, closeLabel }: { person: StaffPublic; closeLabel: string }) {
+function PersonProfile({
+    person,
+    closeLabel,
+}: {
+    person: StaffPublic;
+    closeLabel: string;
+}) {
     const paragraphs = person.bio
         .split(/\n+/)
         .map((paragraph) => paragraph.trim())
@@ -74,20 +103,36 @@ function PersonProfile({ person, closeLabel }: { person: StaffPublic; closeLabel
                     <span className="sr-only">{closeLabel}</span>
                 </DialogClose>
                 {person.photoUrl ? (
-                    <img src={person.photoUrl} alt={person.name} className="h-64 w-full object-cover object-top md:absolute md:inset-0 md:h-full" />
+                    <img
+                        src={person.photoUrl}
+                        alt={person.name}
+                        className="h-64 w-full object-cover object-top md:absolute md:inset-0 md:h-full"
+                    />
                 ) : (
-                    <span className="flex h-64 items-center justify-center bg-deep text-6xl font-medium text-measure md:h-full" aria-hidden="true">
+                    <span
+                        className="flex h-64 items-center justify-center bg-deep text-6xl font-medium text-measure md:h-full"
+                        aria-hidden="true"
+                    >
                         {initials(person.name)}
                     </span>
                 )}
             </div>
             <div className="order-2 px-6 py-8 sm:px-10 md:overflow-y-auto">
                 <DialogTitle className="flex items-start gap-3 text-3xl font-medium text-balance text-sea sm:text-4xl">
-                    <span className="mt-1.5 h-8 w-1 shrink-0 rounded-full bg-measure" aria-hidden="true" />
+                    <span
+                        className="mt-1.5 h-8 w-1 shrink-0 rounded-full bg-measure"
+                        aria-hidden="true"
+                    />
                     <span>{person.name}</span>
                 </DialogTitle>
-                <DialogDescription className="ms-4 mt-3 text-lg leading-7 text-ink">{person.title}</DialogDescription>
-                {person.department ? <p className="ms-4 mt-1 text-sm text-[#3E534C]">{person.department}</p> : null}
+                <DialogDescription className="ms-4 mt-3 text-lg leading-7 text-ink">
+                    {person.title}
+                </DialogDescription>
+                {person.department ? (
+                    <p className="ms-4 mt-1 text-sm text-[#3E534C]">
+                        {person.department}
+                    </p>
+                ) : null}
                 {paragraphs.length > 0 ? (
                     <div className="ms-4 mt-6 max-w-2xl space-y-4 text-base leading-8 text-[#243830]">
                         {paragraphs.map((paragraph) => (
@@ -96,7 +141,10 @@ function PersonProfile({ person, closeLabel }: { person: StaffPublic; closeLabel
                     </div>
                 ) : null}
                 {person.email ? (
-                    <a className="ms-4 mt-6 inline-flex min-h-11 items-center text-sea" href={`mailto:${person.email}`}>
+                    <a
+                        className="ms-4 mt-6 inline-flex min-h-11 items-center text-sea"
+                        href={`mailto:${person.email}`}
+                    >
                         {person.email}
                     </a>
                 ) : null}

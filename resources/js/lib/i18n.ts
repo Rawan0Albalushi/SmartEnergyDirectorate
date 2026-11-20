@@ -10,7 +10,6 @@ const ar = {
     achievements: 'الإنجازات',
     news: 'الأخبار',
     departments: 'الأقسام',
-    staffLogin: 'دخول الإدارة',
     arabic: 'العربية',
     english: 'English',
     heroLead:
@@ -26,7 +25,8 @@ const ar = {
     allProjects: 'عرض جميع المشاريع',
     achievementsHeading: 'الإنجازات',
     achievementsEyebrow: 'أهم ما نحقق',
-    achievementsHomeLede: 'مجموعة من الإنجازات والمبادرات التي تعكس التقدم في قطاع الطاقة في سلطنة عمان.',
+    achievementsHomeLede:
+        'مجموعة من الإنجازات والمبادرات التي تعكس التقدم في قطاع الطاقة في سلطنة عمان.',
     allAchievements: 'عرض جميع الإنجازات',
     readMore: 'اقرأ المزيد',
     allSectors: 'عرض جميع القطاعات',
@@ -34,7 +34,8 @@ const ar = {
     indicatorsHomeLede: 'آخر القراءات المنشورة للقطاعات الأربعة.',
     indicatorsEyebrow: 'المؤشرات الرئيسية',
     sectorDetails: 'عرض تفاصيل القطاع',
-    departmentsHomeLede: 'أقسام متخصصة تعمل معًا لتحقيق أهداف قطاع الطاقة في سلطنة عمان.',
+    departmentsHomeLede:
+        'أقسام متخصصة تعمل معًا لتحقيق أهداف قطاع الطاقة في سلطنة عمان.',
     departmentsHeading: 'أقسام المديرية',
     all: 'الكل',
     local: 'محلي',
@@ -103,8 +104,10 @@ const ar = {
     pendingNews: 'بانتظار المراجعة',
     viewSite: 'عرض الموقع',
     noPending: 'لا توجد مواد بانتظار المراجعة.',
+    emptyRecords: 'لا توجد سجلات.',
     loginTitle: 'دخول الإدارة',
-    loginDescription: 'هذه الصفحة للمسؤولين. الزوار يطلعون على الموقع دون حساب.',
+    loginDescription:
+        'هذه الصفحة للمسؤولين. الزوار يطلعون على الموقع دون حساب.',
     emailAddress: 'البريد الإلكتروني',
     password: 'كلمة المرور',
     remember: 'تذكر هذا الجهاز',
@@ -154,7 +157,6 @@ const ar = {
     fetchedAt: 'آخر جلب',
     staff: 'الموظفون',
     filters: 'النطاق',
-    aboutLead: 'منصة عامة لبيانات الطاقة. لا يحتاج الزائر إلى حساب.',
     sectorsIntro: 'أربعة قطاعات. كل قطاع يعرض آخر القراءات والمشاريع المرتبطة.',
     indicatorsStageTitle: 'أداء قطاع الطاقة',
     indicatorsStageLede: 'أبرز المؤشرات الرئيسية للطاقة في سلطنة عُمان',
@@ -168,6 +170,7 @@ const ar = {
     none: 'بدون',
     languageSwitch: 'اللغة',
     mainNav: 'التنقل الرئيسي',
+    footerNav: 'روابط الموقع',
     adminNav: 'تنقل الإدارة',
     fieldHorizon: 'حقل ألواح شمسية وتوربينات رياح عند الغروب',
     fieldRenewable: 'صفوف ألواح شمسية',
@@ -186,7 +189,6 @@ const en: { [K in keyof typeof ar]: string } = {
     achievements: 'Achievements',
     news: 'News',
     departments: 'Departments',
-    staffLogin: 'Staff sign in',
     arabic: 'العربية',
     english: 'English',
     heroLead:
@@ -202,7 +204,8 @@ const en: { [K in keyof typeof ar]: string } = {
     allProjects: 'View all projects',
     achievementsHeading: 'Achievements',
     achievementsEyebrow: 'What we have delivered',
-    achievementsHomeLede: 'A set of achievements and initiatives that show progress in Oman’s energy sector.',
+    achievementsHomeLede:
+        'A set of achievements and initiatives that show progress in Oman’s energy sector.',
     allAchievements: 'View all achievements',
     readMore: 'Read more',
     allSectors: 'View all sectors',
@@ -210,7 +213,8 @@ const en: { [K in keyof typeof ar]: string } = {
     indicatorsHomeLede: 'The latest published readings for the four sectors.',
     indicatorsEyebrow: 'Key indicators',
     sectorDetails: 'View sector details',
-    departmentsHomeLede: 'Specialist sections working together on the energy sector in the Sultanate of Oman.',
+    departmentsHomeLede:
+        'Specialist sections working together on the energy sector in the Sultanate of Oman.',
     departmentsHeading: 'Directorate sections',
     all: 'All',
     local: 'Local',
@@ -279,8 +283,10 @@ const en: { [K in keyof typeof ar]: string } = {
     pendingNews: 'Awaiting review',
     viewSite: 'View site',
     noPending: 'Nothing is waiting for review.',
+    emptyRecords: 'Nothing is listed yet.',
     loginTitle: 'Staff sign in',
-    loginDescription: 'This page is for editors. Visitors read the site without an account.',
+    loginDescription:
+        'This page is for editors. Visitors read the site without an account.',
     emailAddress: 'Email',
     password: 'Password',
     remember: 'Remember this device',
@@ -324,26 +330,29 @@ const en: { [K in keyof typeof ar]: string } = {
     department: 'Department',
     readingDate: 'Reading date',
     periodLabel: 'Period',
-    newsHint: 'One title is enough. Fetched items stay in review until published.',
+    newsHint:
+        'One title is enough. Fetched items stay in review until published.',
     reviewQueue: 'Review queue',
     lastError: 'Last error',
     fetchedAt: 'Last fetch',
     staff: 'Staff',
     filters: 'Scope',
-    aboutLead: 'A public energy record. Visitors do not need an account.',
-    sectorsIntro: 'Four sectors. Each one shows the latest readings and related projects.',
+    sectorsIntro:
+        'Four sectors. Each one shows the latest readings and related projects.',
     indicatorsStageTitle: 'Energy sector performance',
     indicatorsStageLede: 'The main energy indicators in Oman',
     projectsIntro: 'Published projects. Narrow the list by sector.',
     achievementsIntro: 'Work that has been completed and announced.',
     newsIntro: 'Local and international news after it is approved.',
     departmentsIntro: 'Directorate sections and who to contact.',
-    sourcesIntro: 'Approved sources. Fetching places items in review and does not publish them.',
+    sourcesIntro:
+        'Approved sources. Fetching places items in review and does not publish them.',
     visible: 'Visible',
     hidden: 'Hidden',
     none: 'None',
     languageSwitch: 'Language',
     mainNav: 'Main',
+    footerNav: 'Site links',
     adminNav: 'Admin',
     fieldHorizon: 'Solar field and wind turbines at dusk',
     fieldRenewable: 'Rows of solar panels',
@@ -355,7 +364,10 @@ const en: { [K in keyof typeof ar]: string } = {
 export type Locale = 'ar' | 'en';
 export type TranslationKey = keyof typeof ar;
 
-const dictionaries: Record<Locale, { [K in TranslationKey]: string }> = { ar, en };
+const dictionaries: Record<Locale, { [K in TranslationKey]: string }> = {
+    ar,
+    en,
+};
 
 const labels = {
     planned: 'planned',
@@ -388,10 +400,11 @@ export function useI18n() {
         alternates?: { ar: string; en: string };
     };
     const locale: Locale = props.locale === 'en' ? 'en' : 'ar';
+    const dir: 'rtl' | 'ltr' = locale === 'ar' ? 'rtl' : 'ltr';
 
     return {
         locale,
-        dir: locale === 'ar' ? 'rtl' : 'ltr',
+        dir,
         alternates: props.alternates ?? { ar: '/ar', en: '/en' },
         t: (key: TranslationKey) => translate(locale, key),
     };

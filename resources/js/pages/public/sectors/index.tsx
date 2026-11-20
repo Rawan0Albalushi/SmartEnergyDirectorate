@@ -1,11 +1,21 @@
 import { Head, Link } from '@inertiajs/react';
-import { Activity, BatteryCharging, Building2, Gauge, Layers, PieChart, Weight, Zap, type LucideIcon } from 'lucide-react';
+import {
+    Activity,
+    BatteryCharging,
+    Building2,
+    Gauge,
+    Layers,
+    PieChart,
+    Weight,
+    Zap,
+    type LucideIcon,
+} from 'lucide-react';
 import { StatusBadge } from '@/components/public/entry';
 import { FieldPhoto } from '@/components/public/field-photo';
 import { PageBody } from '@/components/public/frame';
 import { PageIntro } from '@/components/public/page-intro';
 import { formatNumber } from '@/lib/format';
-import { label, useI18n, type Locale } from '@/lib/i18n';
+import { label, useI18n } from '@/lib/i18n';
 import type { IndicatorReading, SectorRecord } from '@/types/content';
 
 export default function SectorsIndex({ sectors }: { sectors: SectorRecord[] }) {
@@ -17,7 +27,9 @@ export default function SectorsIndex({ sectors }: { sectors: SectorRecord[] }) {
             <PageIntro title={t('sectors')} lede={t('sectorsIntro')} />
             {sectors.length === 0 ? (
                 <PageBody>
-                    <p className="text-sm text-[#3E534C]">{t('emptySectors')}</p>
+                    <p className="text-sm text-[#3E534C]">
+                        {t('emptySectors')}
+                    </p>
                 </PageBody>
             ) : (
                 sectors.map((sector, index) => {
@@ -34,14 +46,22 @@ export default function SectorsIndex({ sectors }: { sectors: SectorRecord[] }) {
                                 <div
                                     className={`grid items-center gap-10 lg:gap-16 ${flipped ? 'lg:grid-cols-[6fr_5fr]' : 'lg:grid-cols-[5fr_6fr]'}`}
                                 >
-                                    <div className={flipped ? 'lg:order-2' : undefined}>
+                                    <div
+                                        className={
+                                            flipped ? 'lg:order-2' : undefined
+                                        }
+                                    >
                                         <FieldPhoto
                                             slug={sector.slug}
                                             alt=""
                                             className="aspect-video w-full rounded-2xl object-cover lg:aspect-[5/4]"
                                         />
                                     </div>
-                                    <div className={flipped ? 'lg:order-1' : undefined}>
+                                    <div
+                                        className={
+                                            flipped ? 'lg:order-1' : undefined
+                                        }
+                                    >
                                         <p className="text-[0.9375rem] font-semibold text-sea">
                                             {String(index + 1).padStart(2, '0')}
                                         </p>
@@ -56,9 +76,16 @@ export default function SectorsIndex({ sectors }: { sectors: SectorRecord[] }) {
                                         </p>
                                         {sector.indicators.length > 0 ? (
                                             <ul className="mt-6 flex flex-wrap gap-2">
-                                                {sector.indicators.map((indicator) => (
-                                                    <ReadingMark key={indicator.id} indicator={indicator} />
-                                                ))}
+                                                {sector.indicators.map(
+                                                    (indicator) => (
+                                                        <ReadingMark
+                                                            key={indicator.id}
+                                                            indicator={
+                                                                indicator
+                                                            }
+                                                        />
+                                                    ),
+                                                )}
                                             </ul>
                                         ) : null}
                                     </div>
@@ -83,11 +110,15 @@ function ReadingMark({ indicator }: { indicator: IndicatorReading }) {
                 <Icon className="size-4" aria-hidden="true" />
             </span>
             <span className="min-w-0">
-                <span className="block text-lg font-medium leading-none text-deep tabular-nums">
+                <span className="block text-lg leading-none font-medium text-deep tabular-nums">
                     {formatNumber(indicator.value, locale)}
-                    <span className="ms-1 text-xs font-normal text-[#3E534C]">{indicator.unit}</span>
+                    <span className="ms-1 text-xs font-normal text-[#3E534C]">
+                        {indicator.unit}
+                    </span>
                 </span>
-                <span className="mt-1 line-clamp-2 text-xs leading-4 text-[#3E534C]">{indicator.name}</span>
+                <span className="mt-1 line-clamp-2 text-xs leading-4 text-[#3E534C]">
+                    {indicator.name}
+                </span>
             </span>
         </li>
     );
@@ -136,8 +167,12 @@ function SectorFacts({ sector }: { sector: SectorRecord }) {
 
     return (
         <div className="mt-8">
-            <h3 className="text-sm font-medium text-deep">{t('relatedProjects')}</h3>
-            <ul className={`mt-3 grid gap-3 ${sector.projects.length > 1 ? 'md:grid-cols-2' : ''}`}>
+            <h3 className="text-sm font-medium text-deep">
+                {t('relatedProjects')}
+            </h3>
+            <ul
+                className={`mt-3 grid gap-3 ${sector.projects.length > 1 ? 'md:grid-cols-2' : ''}`}
+            >
                 {sector.projects.map((project, index) => (
                     <li key={project.slug}>
                         <Link
@@ -153,13 +188,23 @@ function SectorFacts({ sector }: { sector: SectorRecord }) {
                             </span>
                             <span className="min-w-0 flex-1 p-3 sm:p-4">
                                 <span className="flex flex-wrap items-center gap-2">
-                                    <span className="text-sm tabular-nums text-[#3E534C]">{project.year}</span>
-                                    <StatusBadge status={project.status}>{label(locale, project.status)}</StatusBadge>
+                                    <span className="text-sm text-[#3E534C] tabular-nums">
+                                        {project.year}
+                                    </span>
+                                    <StatusBadge status={project.status}>
+                                        {label(locale, project.status)}
+                                    </StatusBadge>
                                 </span>
-                                <span className="mt-1.5 block text-base font-medium leading-6 text-ink">{project.title}</span>
-                                <span className="mt-1 line-clamp-2 text-sm leading-6 text-[#3E534C]">{project.summary}</span>
+                                <span className="mt-1.5 block text-base leading-6 font-medium text-ink">
+                                    {project.title}
+                                </span>
+                                <span className="mt-1 line-clamp-2 text-sm leading-6 text-[#3E534C]">
+                                    {project.summary}
+                                </span>
                                 {project.location ? (
-                                    <span className="mt-1 block truncate text-sm text-[#3E534C]">{project.location}</span>
+                                    <span className="mt-1 block truncate text-sm text-[#3E534C]">
+                                        {project.location}
+                                    </span>
                                 ) : null}
                             </span>
                         </Link>
@@ -170,4 +215,8 @@ function SectorFacts({ sector }: { sector: SectorRecord }) {
     );
 }
 
-const cropPositions = ['object-center', 'object-[28%_center]', 'object-[72%_40%]'];
+const cropPositions = [
+    'object-center',
+    'object-[28%_center]',
+    'object-[72%_40%]',
+];

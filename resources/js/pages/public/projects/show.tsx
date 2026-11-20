@@ -6,7 +6,7 @@ import { label, useI18n } from '@/lib/i18n';
 import type { ProjectDetail } from '@/types/content';
 
 export default function ProjectShow({ project }: { project: ProjectDetail }) {
-    const { t, locale } = useI18n();
+    const { locale } = useI18n();
 
     return (
         <>
@@ -22,10 +22,18 @@ export default function ProjectShow({ project }: { project: ProjectDetail }) {
                 ) : null}
             </PageIntro>
             <PageBody>
-                {project.body ? <p className="max-w-3xl text-base leading-8">{project.body}</p> : null}
+                {project.body ? (
+                    <p className="max-w-3xl text-base leading-8">
+                        {project.body}
+                    </p>
+                ) : null}
                 {project.sector ? (
                     <p className={project.body ? 'mt-8' : ''}>
-                        <ForwardLink href={`/${locale}/sectors#${project.sector.slug}`}>{project.sector.name}</ForwardLink>
+                        <ForwardLink
+                            href={`/${locale}/sectors#${project.sector.slug}`}
+                        >
+                            {project.sector.name}
+                        </ForwardLink>
                     </p>
                 ) : null}
             </PageBody>

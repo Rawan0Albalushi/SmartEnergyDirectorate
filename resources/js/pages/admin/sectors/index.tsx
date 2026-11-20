@@ -1,4 +1,11 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import {
+    EditLink,
+    Meta,
+    PageIntro,
+    RecordList,
+    RecordRow,
+} from '@/components/admin/chrome';
 import { useI18n } from '@/lib/i18n';
 
 type Row = { slug: string; name: string; summary: string; editUrl: string };
@@ -9,18 +16,20 @@ export default function SectorIndex({ sectors }: { sectors: Row[] }) {
     return (
         <>
             <Head title={t('sectors')} />
-            <h1 className="text-2xl font-medium">{t('sectors')}</h1>
-            <ul className="mt-6 divide-y divide-line border-y border-line">
+            <PageIntro title={t('sectors')} />
+            <RecordList count={sectors.length} empty={t('emptyRecords')}>
                 {sectors.map((sector) => (
-                    <li key={sector.slug} className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
-                        <span>
-                            <span className="block text-lg">{sector.name}</span>
-                            <span className="text-sm text-[#3E534C]">{sector.summary}</span>
+                    <RecordRow key={sector.slug}>
+                        <span className="min-w-0">
+                            <span className="block text-base font-medium">
+                                {sector.name}
+                            </span>
+                            <Meta parts={[sector.summary]} />
                         </span>
-                        <Link href={sector.editUrl} className="inline-flex min-h-11 items-center underline">{t('edit')}</Link>
-                    </li>
+                        <EditLink href={sector.editUrl}>{t('edit')}</EditLink>
+                    </RecordRow>
                 ))}
-            </ul>
+            </RecordList>
         </>
     );
 }

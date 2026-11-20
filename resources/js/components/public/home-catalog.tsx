@@ -15,6 +15,7 @@ import {
 import { useState, type ReactNode } from 'react';
 import { SectorGlyph } from '@/components/public/entry';
 import { FieldPhoto } from '@/components/public/field-photo';
+import { SectionHeading } from '@/components/public/section-heading';
 import { formatNumber } from '@/lib/format';
 import { useI18n, type Locale } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -38,20 +39,32 @@ export function HomeIndicators({
     const { t, locale } = useI18n();
     const [active, setActive] = useState<string | null>(null);
     const featured = sectors.find((sector) => sector.slug === active) ?? null;
-    const rows = featured ? indicators.filter((item) => item.sector?.slug === featured.slug) : indicators;
+    const rows = featured
+        ? indicators.filter((item) => item.sector?.slug === featured.slug)
+        : indicators;
 
     return (
-        <section className="mx-auto max-w-[90rem] px-4 py-10 sm:px-6 lg:px-6 lg:py-14" aria-labelledby="home-indicators">
-            <div className="max-w-xl">
-                <h2 id="home-indicators" className="text-3xl font-medium text-deep sm:text-4xl">
-                    {t('indicatorsEyebrow')}
-                </h2>
-                <p className="mt-2 text-sm leading-7 text-[#3E534C]">{t('indicatorsHomeLede')}</p>
-            </div>
+        <section
+            className="mx-auto max-w-[90rem] px-4 py-10 sm:px-6 lg:px-6 lg:py-14"
+            aria-labelledby="home-indicators"
+        >
+            <SectionHeading
+                id="home-indicators"
+                title={t('indicatorsEyebrow')}
+                lede={t('indicatorsHomeLede')}
+            />
 
             {sectors.length > 0 ? (
-                <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label={t('sectors')}>
-                    <FilterPill current={active === null} onSelect={() => setActive(null)} id="home-sector-tab-all">
+                <div
+                    className="mt-8 flex flex-wrap gap-2"
+                    role="tablist"
+                    aria-label={t('sectors')}
+                >
+                    <FilterPill
+                        current={active === null}
+                        onSelect={() => setActive(null)}
+                        id="home-sector-tab-all"
+                    >
                         <LayoutGrid className="size-3.5" aria-hidden="true" />
                         {t('all')}
                     </FilterPill>
@@ -62,7 +75,10 @@ export function HomeIndicators({
                             onSelect={() => setActive(sector.slug)}
                             id={`home-sector-tab-${sector.slug}`}
                         >
-                            <SectorGlyph slug={sector.slug} className="size-3.5" />
+                            <SectorGlyph
+                                slug={sector.slug}
+                                className="size-3.5"
+                            />
                             {sector.name}
                         </FilterPill>
                     ))}
@@ -72,24 +88,49 @@ export function HomeIndicators({
             <div
                 id="home-indicators-panel"
                 role="tabpanel"
-                aria-labelledby={featured ? `home-sector-tab-${featured.slug}` : 'home-sector-tab-all'}
+                aria-labelledby={
+                    featured
+                        ? `home-sector-tab-${featured.slug}`
+                        : 'home-sector-tab-all'
+                }
                 className="mt-6"
             >
                 {rows.length === 0 ? (
-                    <p className="text-sm text-[#3E534C]">{t('emptyIndicators')}</p>
+                    <p className="text-sm text-[#3E534C]">
+                        {t('emptyIndicators')}
+                    </p>
                 ) : (
                     <div className="grid items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
                         <ul className="grid h-full grid-cols-2 gap-4 lg:grid-cols-4">
                             {rows.map((indicator, index) => (
-                                <ReadingCard key={indicator.id} indicator={indicator} index={index} locale={locale} />
+                                <ReadingCard
+                                    key={indicator.id}
+                                    indicator={indicator}
+                                    index={index}
+                                    locale={locale}
+                                />
                             ))}
                         </ul>
                         <StageCard
                             featured={featured}
-                            title={featured ? featured.name : t('indicatorsStageTitle')}
-                            lede={featured ? featured.summary : t('indicatorsStageLede')}
-                            href={featured ? `/${locale}/sectors#${featured.slug}` : `/${locale}/sectors`}
-                            action={featured ? t('sectorDetails') : t('allSectors')}
+                            title={
+                                featured
+                                    ? featured.name
+                                    : t('indicatorsStageTitle')
+                            }
+                            lede={
+                                featured
+                                    ? featured.summary
+                                    : t('indicatorsStageLede')
+                            }
+                            href={
+                                featured
+                                    ? `/${locale}/sectors#${featured.slug}`
+                                    : `/${locale}/sectors`
+                            }
+                            action={
+                                featured ? t('sectorDetails') : t('allSectors')
+                            }
                         />
                     </div>
                 )}
@@ -128,20 +169,43 @@ function FilterPill({
     );
 }
 
-function ReadingCard({ indicator, index, locale }: { indicator: IndicatorReading; index: number; locale: Locale }) {
+function ReadingCard({
+    indicator,
+    index,
+    locale,
+}: {
+    indicator: IndicatorReading;
+    index: number;
+    locale: Locale;
+}) {
     const tone = cardTones[index % cardTones.length];
     const Icon = readingIcon(indicator.unit, indicator.sector?.slug ?? '');
 
     return (
         <li className="flex h-full min-h-40 flex-col items-center justify-center rounded-[1.35rem] bg-white px-3 py-5 text-center shadow-[0_10px_28px_rgba(18,36,51,0.05)]">
-            <span className={cn('grid size-12 place-items-center rounded-2xl', tone.plate, tone.ink)}>
+            <span
+                className={cn(
+                    'grid size-12 place-items-center rounded-2xl',
+                    tone.plate,
+                    tone.ink,
+                )}
+            >
                 <Icon className="size-5" aria-hidden="true" />
             </span>
-            <p className={cn('mt-3 text-3xl font-semibold tracking-tight tabular-nums', tone.ink)}>
+            <p
+                className={cn(
+                    'mt-3 text-3xl font-semibold tracking-tight tabular-nums',
+                    tone.ink,
+                )}
+            >
                 {formatNumber(indicator.value, locale)}
-                <span className="ms-1 text-sm font-medium">{indicator.unit}</span>
+                <span className="ms-1 text-sm font-medium">
+                    {indicator.unit}
+                </span>
             </p>
-            <p className="mt-1.5 text-sm leading-6 text-[#5c6f68]">{indicator.name}</p>
+            <p className="mt-1.5 text-sm leading-6 text-[#5c6f68]">
+                {indicator.name}
+            </p>
         </li>
     );
 }
@@ -167,19 +231,35 @@ function StageCard({
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover object-[center_68%]"
             />
-            <span className="absolute inset-0 bg-gradient-to-b from-deep/72 via-deep/5 to-deep/55" aria-hidden="true" />
+            <span
+                className="absolute inset-0 bg-gradient-to-b from-deep/72 via-deep/5 to-deep/55"
+                aria-hidden="true"
+            />
             <div className="relative flex flex-1 flex-col p-5 sm:p-6">
                 <span className="grid size-11 place-items-center rounded-full bg-white/15 text-measure">
-                    {featured ? <SectorGlyph slug={featured.slug} className="size-5" /> : <Leaf className="size-5" aria-hidden="true" />}
+                    {featured ? (
+                        <SectorGlyph slug={featured.slug} className="size-5" />
+                    ) : (
+                        <Leaf className="size-5" aria-hidden="true" />
+                    )}
                 </span>
-                <h3 className="mt-4 max-w-xs text-2xl font-medium leading-8">{title}</h3>
-                {lede ? <p className="mt-2 max-w-xs text-sm leading-7 text-[#F4F7F5]">{lede}</p> : null}
+                <h3 className="mt-4 max-w-xs text-2xl leading-8 font-medium">
+                    {title}
+                </h3>
+                {lede ? (
+                    <p className="mt-2 max-w-xs text-sm leading-7 text-[#F4F7F5]">
+                        {lede}
+                    </p>
+                ) : null}
                 <Link
                     href={href}
                     className="mt-6 inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-white ps-1.5 pe-4 text-sm text-deep lg:mt-auto"
                 >
                     <span className="grid size-8 place-items-center rounded-full bg-[#e7f1ee]">
-                        <ArrowLeft className="size-4 ltr:scale-x-[-1]" aria-hidden="true" />
+                        <ArrowLeft
+                            className="size-4 ltr:scale-x-[-1]"
+                            aria-hidden="true"
+                        />
                     </span>
                     {action}
                 </Link>
@@ -211,7 +291,11 @@ function readingIcon(unit: string, sector: string): LucideIcon {
         return BatteryCharging;
     }
 
-    if (normalized.includes('واط') || normalized === 'mw' || normalized === 'gw') {
+    if (
+        normalized.includes('واط') ||
+        normalized === 'mw' ||
+        normalized === 'gw'
+    ) {
         return sector === 'electricity' ? Zap : SunMedium;
     }
 

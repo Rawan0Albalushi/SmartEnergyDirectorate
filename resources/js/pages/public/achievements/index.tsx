@@ -28,11 +28,11 @@ export default function AchievementsIndex({
 
         const rail = root.querySelector<HTMLElement>('.chronicle-rail');
 
-        const fit = () => {
-            if (!rail) {
-                return;
-            }
+        if (!rail) {
+            return;
+        }
 
+        const fit = () => {
             const nodes = root.querySelectorAll<HTMLElement>('.chronicle-node');
             const first = nodes[0];
             const last = nodes[nodes.length - 1];
@@ -75,9 +75,16 @@ export default function AchievementsIndex({
     return (
         <>
             <Head title={t('achievements')} />
-            <PageIntro title={t('achievements')} lede={t('achievementsIntro')} />
+            <PageIntro
+                title={t('achievements')}
+                lede={t('achievementsIntro')}
+            />
             <PageBody>
-                {achievements.length === 0 ? <p className="text-sm text-[#3E534C]">{t('emptyAchievements')}</p> : null}
+                {achievements.length === 0 ? (
+                    <p className="text-sm text-[#3E534C]">
+                        {t('emptyAchievements')}
+                    </p>
+                ) : null}
 
                 {years.length > 0 ? (
                     <div className="chronicle" ref={chronicleRef}>
@@ -85,28 +92,56 @@ export default function AchievementsIndex({
                             <span className="chronicle-rail__draw" />
                         </div>
                         {years.map((group) => (
-                            <section key={group.year} className="chronicle-year" aria-labelledby={`achievements-${group.year}`}>
+                            <section
+                                key={group.year}
+                                className="chronicle-year"
+                                aria-labelledby={`achievements-${group.year}`}
+                            >
                                 <ol className="chronicle-list">
                                     {group.items.map((item, index) => (
                                         <li key={item.id}>
                                             <article className="chronicle-entry">
                                                 <div className="chronicle-side">
                                                     {index === 0 ? (
-                                                        <h2 id={`achievements-${group.year}`} className="chronicle-year__label">
-                                                            <time dateTime={String(group.year)}>{group.year}</time>
+                                                        <h2
+                                                            id={`achievements-${group.year}`}
+                                                            className="chronicle-year__label"
+                                                        >
+                                                            <time
+                                                                dateTime={String(
+                                                                    group.year,
+                                                                )}
+                                                            >
+                                                                {group.year}
+                                                            </time>
                                                         </h2>
                                                     ) : null}
                                                     <span className="chronicle-photo">
-                                                        <AchievementPhoto item={item} />
+                                                        <AchievementPhoto
+                                                            item={item}
+                                                        />
                                                     </span>
                                                 </div>
                                                 <div className="chronicle-copy">
-                                                    <span className="chronicle-node" aria-hidden="true" />
-                                                    <h3 className="chronicle-title">{item.title}</h3>
-                                                    <p className="chronicle-summary">{item.summary}</p>
+                                                    <span
+                                                        className="chronicle-node"
+                                                        aria-hidden="true"
+                                                    />
+                                                    <h3 className="chronicle-title">
+                                                        {item.title}
+                                                    </h3>
+                                                    <p className="chronicle-summary">
+                                                        {item.summary}
+                                                    </p>
                                                     {item.sector ? (
                                                         <p className="chronicle-sector">
-                                                            <SectorGlyph slug={item.sector.slug} className="size-4" />
+                                                            <SectorGlyph
+                                                                slug={
+                                                                    item.sector
+                                                                        .slug
+                                                                }
+                                                                className="size-4"
+                                                            />
                                                             {item.sector.name}
                                                         </p>
                                                     ) : null}

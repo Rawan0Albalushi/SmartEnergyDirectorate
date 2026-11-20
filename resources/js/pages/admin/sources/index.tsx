@@ -1,4 +1,12 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import {
+    EditLink,
+    Meta,
+    PageIntro,
+    PrimaryLink,
+    RecordList,
+    RecordRow,
+} from '@/components/admin/chrome';
 import { label, useI18n } from '@/lib/i18n';
 
 type Row = {
@@ -18,21 +26,44 @@ export default function SourceIndex({ sources }: { sources: Row[] }) {
     return (
         <>
             <Head title={t('sources')} />
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <h1 className="text-2xl font-medium">{t('sources')}</h1>
-                <Link href={`/${locale}/admin/sources/create`} className="inline-flex min-h-11 items-center bg-deep px-4 text-sm text-white">{t('create')}</Link>
-            </div>
-            <p className="mt-2 max-w-2xl text-sm text-[#3E534C]">{t('sourcesIntro')}</p>
-            <ul className="mt-6 divide-y divide-line border-y border-line">
+            <PageIntro
+                title={t('sources')}
+                hint={t('sourcesIntro')}
+                action={
+                    <PrimaryLink href={`/${locale}/admin/sources/create`}>
+                        {t('create')}
+                    </PrimaryLink>
+                }
+            />
+            <RecordList count={sources.length} empty={t('emptyRecords')}>
                 {sources.map((source) => (
-                    <li key={source.id} className="py-4">
-                        <Link href={source.editUrl} className="text-lg underline">{source.name}</Link>
-                        <p className="mt-1 break-all text-sm text-[#3E534C]">{source.feedUrl}</p>
-                        <p className="mt-1 text-sm text-[#3E534C]">{source.locale} · {label(locale, source.scope)} · {source.isActive ? t('active') : t('inactive')}</p>
-                        {source.lastError ? <p className="mt-1 text-sm text-[#B42318]">{source.lastError}</p> : null}
-                    </li>
+                    <RecordRow key={source.id}>
+                        <span className="min-w-0">
+                            <span className="block text-base font-medium">
+                                {source.name}
+                            </span>
+                            <p className="mt-1 text-sm break-all text-[#3e534c]">
+                                {source.feedUrl}
+                            </p>
+                            <Meta
+                                parts={[
+                                    source.locale,
+                                    label(locale, source.scope),
+                                    source.isActive
+                                        ? t('active')
+                                        : t('inactive'),
+                                ]}
+                            />
+                            {source.lastError ? (
+                                <p className="mt-1 text-sm text-[#9f2c22]">
+                                    {source.lastError}
+                                </p>
+                            ) : null}
+                        </span>
+                        <EditLink href={source.editUrl}>{t('edit')}</EditLink>
+                    </RecordRow>
                 ))}
-            </ul>
+            </RecordList>
         </>
     );
 }

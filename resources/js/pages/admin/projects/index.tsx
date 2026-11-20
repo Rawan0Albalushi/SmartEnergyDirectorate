@@ -1,31 +1,74 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import {
+    EditLink,
+    Meta,
+    PageIntro,
+    PrimaryLink,
+    RecordList,
+    RecordRow,
+    Visibility,
+} from '@/components/admin/chrome';
 import { Pager } from '@/components/public/pager';
 import { label, useI18n } from '@/lib/i18n';
 import type { PageMeta } from '@/types/content';
 
-type Row = { title: string; year: number; status: string; isPublished: boolean; sector: string; editUrl: string };
+type Row = {
+    title: string;
+    year: number;
+    status: string;
+    isPublished: boolean;
+    sector: string;
+    editUrl: string;
+};
 
-export default function ProjectIndex({ projects, page }: { projects: Row[]; page: PageMeta }) {
+export default function ProjectIndex({
+    projects,
+    page,
+}: {
+    projects: Row[];
+    page: PageMeta;
+}) {
     const { t, locale } = useI18n();
 
     return (
         <>
             <Head title={t('projects')} />
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <h1 className="text-2xl font-medium">{t('projects')}</h1>
-                <Link href={`/${locale}/admin/projects/create`} className="inline-flex min-h-11 items-center bg-deep px-4 text-sm text-white">{t('create')}</Link>
-            </div>
-            <ul className="mt-6 divide-y divide-line border-y border-line">
+            <PageIntro
+                title={t('projects')}
+                action={
+                    <PrimaryLink href={`/${locale}/admin/projects/create`}>
+                        {t('create')}
+                    </PrimaryLink>
+                }
+            />
+            <RecordList count={projects.length} empty={t('emptyRecords')}>
                 {projects.map((project) => (
-                    <li key={project.editUrl} className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
-                        <span>
-                            <span className="block text-lg">{project.title}</span>
-                            <span className="text-sm text-[#3E534C]">{project.sector} · {project.year} · {label(locale, project.status)} · {project.isPublished ? t('visible') : t('hidden')}</span>
+                    <RecordRow key={project.editUrl}>
+                        <span className="min-w-0">
+                            <span className="block text-base font-medium">
+                                {project.title}
+                            </span>
+                            <Meta
+                                parts={[
+                                    project.sector,
+                                    String(project.year),
+                                    label(locale, project.status),
+                                ]}
+                            />
                         </span>
-                        <Link href={project.editUrl} className="inline-flex min-h-11 items-center underline">{t('edit')}</Link>
-                    </li>
+                        <span className="flex items-center gap-4">
+                            <Visibility
+                                published={project.isPublished}
+                                visible={t('visible')}
+                                hidden={t('hidden')}
+                            />
+                            <EditLink href={project.editUrl}>
+                                {t('edit')}
+                            </EditLink>
+                        </span>
+                    </RecordRow>
                 ))}
-            </ul>
+            </RecordList>
             <Pager page={page} />
         </>
     );

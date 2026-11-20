@@ -28,35 +28,58 @@ export default function NewsIndex({
             <PageIntro title={t('news')} lede={t('newsIntro')} />
             <PageBody>
                 <nav className="flex flex-wrap gap-2" aria-label={t('filters')}>
-                    <FilterPill href={`/${locale}/news`} current={activeScope === null}>
+                    <FilterPill
+                        href={`/${locale}/news`}
+                        current={activeScope === null}
+                    >
                         <LayoutGrid className="size-3.5" aria-hidden="true" />
                         {t('all')}
                     </FilterPill>
-                    <FilterPill href={`/${locale}/news?scope=local`} current={activeScope === 'local'}>
+                    <FilterPill
+                        href={`/${locale}/news?scope=local`}
+                        current={activeScope === 'local'}
+                    >
                         <MapPin className="size-3.5" aria-hidden="true" />
                         {t('local')}
                     </FilterPill>
-                    <FilterPill href={`/${locale}/news?scope=international`} current={activeScope === 'international'}>
+                    <FilterPill
+                        href={`/${locale}/news?scope=international`}
+                        current={activeScope === 'international'}
+                    >
                         <Globe className="size-3.5" aria-hidden="true" />
                         {t('international')}
                     </FilterPill>
                 </nav>
 
-                {articles.length === 0 ? <p className="mt-8 text-sm text-[#3E534C]">{t('emptyNews')}</p> : null}
+                {articles.length === 0 ? (
+                    <p className="mt-8 text-sm text-[#3E534C]">
+                        {t('emptyNews')}
+                    </p>
+                ) : null}
 
                 {lead ? (
-                    <div className={`mt-8 grid gap-4 ${sides.length > 0 ? 'lg:grid-cols-3' : ''}`}>
+                    <div
+                        className={`mt-8 grid gap-4 ${sides.length > 0 ? 'lg:grid-cols-3' : ''}`}
+                    >
                         <NewsCover
                             article={lead}
                             titleClassName="text-2xl sm:text-[1.7rem]"
-                            className={sides.length > 0 ? 'min-h-[22rem] lg:col-span-2 lg:min-h-[32rem]' : 'min-h-[22rem] lg:min-h-[28rem]'}
+                            className={
+                                sides.length > 0
+                                    ? 'min-h-[22rem] lg:col-span-2 lg:min-h-[32rem]'
+                                    : 'min-h-[22rem] lg:min-h-[28rem]'
+                            }
                         />
                         {sides.length > 0 ? (
                             <div
                                 className={`grid h-full gap-4 ${sides.length > 1 ? 'sm:grid-cols-2 lg:grid-cols-1 lg:grid-rows-2' : ''}`}
                             >
                                 {sides.map((article) => (
-                                    <NewsCover key={article.slug} article={article} className="h-full min-h-56" />
+                                    <NewsCover
+                                        key={article.slug}
+                                        article={article}
+                                        className="h-full min-h-56"
+                                    />
                                 ))}
                             </div>
                         ) : null}
@@ -65,7 +88,9 @@ export default function NewsIndex({
 
                 {articles.length > 0 ? (
                     <section className="mt-14" aria-labelledby="latest-news">
-                        <SectionTitle id="latest-news">{t('latestNews')}</SectionTitle>
+                        <SectionTitle id="latest-news">
+                            {t('latestNews')}
+                        </SectionTitle>
                         <ul className="mt-6 grid gap-8">
                             {articles.map((article) => (
                                 <li key={article.slug}>
@@ -78,15 +103,31 @@ export default function NewsIndex({
                                         </span>
                                         <span className="min-w-0">
                                             <span className="flex flex-wrap items-center gap-2">
-                                                <time className="text-sm text-[#3E534C]" dateTime={article.publishedAt ?? undefined}>
-                                                    {formatDate(article.publishedAt, locale)}
+                                                <time
+                                                    className="text-sm text-[#3E534C]"
+                                                    dateTime={
+                                                        article.publishedAt ??
+                                                        undefined
+                                                    }
+                                                >
+                                                    {formatDate(
+                                                        article.publishedAt,
+                                                        locale,
+                                                    )}
                                                 </time>
-                                                <ScopeBadge>{label(locale, article.scope)}</ScopeBadge>
+                                                <ScopeBadge>
+                                                    {label(
+                                                        locale,
+                                                        article.scope,
+                                                    )}
+                                                </ScopeBadge>
                                             </span>
-                                            <span className="mt-2 block text-xl font-medium leading-8 text-ink group-hover:text-sea">
+                                            <span className="mt-2 block text-xl leading-8 font-medium text-ink group-hover:text-sea">
                                                 {article.title}
                                             </span>
-                                            <span className="mt-2 line-clamp-2 text-sm leading-7 text-[#3E534C]">{article.summary}</span>
+                                            <span className="mt-2 line-clamp-2 text-sm leading-7 text-[#3E534C]">
+                                                {article.summary}
+                                            </span>
                                         </span>
                                     </Link>
                                 </li>

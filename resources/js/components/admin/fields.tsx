@@ -1,9 +1,32 @@
 import { Link, router } from '@inertiajs/react';
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import {
+    useEffect,
+    useRef,
+    useState,
+    type FormEvent,
+    type ReactNode,
+} from 'react';
+import { primaryButtonClass } from '@/components/admin/chrome';
 import { useI18n } from '@/lib/i18n';
 
 export const fieldClass =
-    'min-h-11 w-full border border-line bg-white px-3 text-base text-ink outline-none';
+    'min-h-11 w-full rounded-[6px] border border-line bg-white px-3 text-base text-ink transition-colors duration-150 focus-visible:border-sea';
+
+export function FieldPair({ children }: { children: ReactNode }) {
+    return <div className="grid gap-5 md:grid-cols-2">{children}</div>;
+}
+
+function FieldError({ id, error }: { id: string; error?: string }) {
+    if (!error) {
+        return null;
+    }
+
+    return (
+        <p id={`${id}-error`} className="text-sm text-[#9f2c22]">
+            {error}
+        </p>
+    );
+}
 
 export function TextField({
     id,
@@ -24,7 +47,7 @@ export function TextField({
 }) {
     return (
         <div className="grid gap-2">
-            <label htmlFor={id} className="text-sm font-medium">
+            <label htmlFor={id} className="text-sm font-medium text-ink">
                 {label}
             </label>
             <input
@@ -38,11 +61,7 @@ export function TextField({
                 onChange={(event) => onChange(event.target.value)}
                 className={fieldClass}
             />
-            {error ? (
-                <p id={`${id}-error`} className="text-sm text-[#B42318]">
-                    {error}
-                </p>
-            ) : null}
+            <FieldError id={id} error={error} />
         </div>
     );
 }
@@ -62,7 +81,7 @@ export function AreaField({
 }) {
     return (
         <div className="grid gap-2">
-            <label htmlFor={id} className="text-sm font-medium">
+            <label htmlFor={id} className="text-sm font-medium text-ink">
                 {label}
             </label>
             <textarea
@@ -73,13 +92,9 @@ export function AreaField({
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? `${id}-error` : undefined}
                 onChange={(event) => onChange(event.target.value)}
-                className="w-full border border-line bg-white px-3 py-2 text-base text-ink outline-none"
+                className="w-full rounded-[6px] border border-line bg-white px-3 py-2 text-base leading-6 text-ink transition-colors duration-150 focus-visible:border-sea"
             />
-            {error ? (
-                <p id={`${id}-error`} className="text-sm text-[#B42318]">
-                    {error}
-                </p>
-            ) : null}
+            <FieldError id={id} error={error} />
         </div>
     );
 }
@@ -101,7 +116,7 @@ export function SelectField({
 }) {
     return (
         <div className="grid gap-2">
-            <label htmlFor={id} className="text-sm font-medium">
+            <label htmlFor={id} className="text-sm font-medium text-ink">
                 {label}
             </label>
             <select
@@ -111,7 +126,7 @@ export function SelectField({
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? `${id}-error` : undefined}
                 onChange={(event) => onChange(event.target.value)}
-                className={fieldClass}
+                className={`${fieldClass} cursor-pointer`}
             >
                 {options.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -119,11 +134,7 @@ export function SelectField({
                     </option>
                 ))}
             </select>
-            {error ? (
-                <p id={`${id}-error`} className="text-sm text-[#B42318]">
-                    {error}
-                </p>
-            ) : null}
+            <FieldError id={id} error={error} />
         </div>
     );
 }
@@ -134,6 +145,7 @@ export function RecordForm({
     processing,
     onSubmit,
     cancelHref,
+    deleteUrl,
     children,
 }: {
     title: string;
@@ -141,6 +153,7 @@ export function RecordForm({
     processing: boolean;
     onSubmit: (event: FormEvent<HTMLFormElement>) => void;
     cancelHref: string;
+    deleteUrl?: string;
     children: ReactNode;
 }) {
     const { t } = useI18n();
@@ -153,33 +166,62 @@ export function RecordForm({
         }
     }, [errorKey]);
 
-    const messages = Object.entries(errors).filter((entry): entry is [string, string] => Boolean(entry[1]));
+    const messages = Object.entries(errors).filter(
+        (entry): entry is [string, string] => Boolean(entry[1]),
+    );
 
     return (
-        <form onSubmit={onSubmit} className="grid max-w-3xl gap-5">
-            <h1 className="text-2xl font-medium">{title}</h1>
-            {messages.length > 0 ? (
-                <div ref={summary} tabIndex={-1} role="alert" className="border border-[#B42318] bg-white p-4">
-                    <h2 className="font-medium">{t('problem')}</h2>
-                    <ul className="mt-2 list-disc ps-5 text-sm">
-                        {messages.map(([field, message]) => (
-                            <li key={field}>
-                                <a href={`#${field}`} className="underline">
-                                    {message}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ) : null}
-            {children}
-            <div className="flex flex-wrap gap-3">
-                <button type="submit" disabled={processing} className="inline-flex min-h-11 items-center bg-deep px-4 text-sm text-white disabled:opacity-60">
+        <form
+            onSubmit={onSubmit}
+            className="max-w-3xl overflow-hidden rounded-[8px] border border-line bg-white"
+        >
+            <div className="border-b border-line px-5 py-5 sm:px-7">
+                <h1 className="text-[1.75rem] leading-tight font-medium tracking-[-0.02em]">
+                    {title}
+                </h1>
+            </div>
+            <div className="grid gap-5 px-5 py-6 sm:px-7">
+                {messages.length > 0 ? (
+                    <div
+                        ref={summary}
+                        tabIndex={-1}
+                        role="alert"
+                        className="rounded-[6px] border border-[#e7c6c2] bg-[#fdf6f5] p-4"
+                    >
+                        <h2 className="font-medium text-[#9f2c22]">
+                            {t('problem')}
+                        </h2>
+                        <ul className="mt-2 list-disc ps-5 text-sm">
+                            {messages.map(([field, message]) => (
+                                <li key={field}>
+                                    <a
+                                        href={`#${field}`}
+                                        className="underline underline-offset-4"
+                                    >
+                                        {message}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : null}
+                {children}
+            </div>
+            <div className="flex flex-wrap items-center gap-3 border-t border-line px-5 py-4 sm:px-7">
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className={primaryButtonClass}
+                >
                     {processing ? t('saving') : t('save')}
                 </button>
-                <Link href={cancelHref} className="inline-flex min-h-11 items-center px-3 text-sm underline">
+                <Link
+                    href={cancelHref}
+                    className="inline-flex min-h-11 items-center px-3 text-sm text-[#3e534c] underline-offset-4 hover:text-ink hover:underline"
+                >
                     {t('cancel')}
                 </Link>
+                {deleteUrl ? <DeleteControl url={deleteUrl} /> : null}
             </div>
         </form>
     );
@@ -191,7 +233,11 @@ export function DeleteControl({ url }: { url: string }) {
 
     if (!open) {
         return (
-            <button type="button" className="text-sm text-[#B42318] underline" onClick={() => setOpen(true)}>
+            <button
+                type="button"
+                className="ms-auto inline-flex min-h-11 cursor-pointer items-center text-sm text-[#9f2c22] underline-offset-4 hover:underline"
+                onClick={() => setOpen(true)}
+            >
                 {t('delete')}
             </button>
         );
@@ -200,7 +246,7 @@ export function DeleteControl({ url }: { url: string }) {
     return (
         <button
             type="button"
-            className="inline-flex min-h-11 items-center border border-[#B42318] px-3 text-sm text-[#B42318]"
+            className="ms-auto inline-flex min-h-11 cursor-pointer items-center rounded-[6px] border border-[#e7c6c2] bg-[#fdf6f5] px-3 text-sm text-[#9f2c22]"
             onClick={() => router.delete(url)}
         >
             {t('confirmDelete')}

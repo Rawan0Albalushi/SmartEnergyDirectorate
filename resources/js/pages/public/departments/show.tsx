@@ -14,7 +14,9 @@ export default function DepartmentShow({
     staff: StaffPublic[];
 }) {
     const { t } = useI18n();
-    const hasBrief = Boolean(department.mandate || department.email || department.phone);
+    const hasBrief = Boolean(
+        department.mandate || department.email || department.phone,
+    );
 
     return (
         <>
@@ -23,9 +25,13 @@ export default function DepartmentShow({
             <PageBody>
                 <DepartmentBrief department={department} />
 
-                <SectionTitle className={hasBrief ? 'mt-12' : ''}>{t('staff')}</SectionTitle>
+                <SectionTitle className={hasBrief ? 'mt-12' : ''}>
+                    {t('staff')}
+                </SectionTitle>
                 {staff.length === 0 ? (
-                    <p className="mt-4 text-sm text-[#3E534C]">{t('emptyStaff')}</p>
+                    <p className="mt-4 text-sm text-[#3E534C]">
+                        {t('emptyStaff')}
+                    </p>
                 ) : (
                     <div className="mt-6">
                         <PersonGallery people={staff} />
@@ -69,16 +75,20 @@ function DepartmentBrief({ department }: { department: DepartmentDetail }) {
             <div className="px-6 py-7 sm:px-8 sm:py-8">
                 {department.mandate ? (
                     <>
-                        <SectionTitle id="department-mandate">{t('mandate')}</SectionTitle>
-                        <p className="mt-4 max-w-[65ch] text-lg leading-9 text-ink">{department.mandate}</p>
+                        <SectionTitle id="department-mandate">
+                            {t('mandate')}
+                        </SectionTitle>
+                        <p className="mt-4 max-w-[65ch] text-lg leading-9 text-ink">
+                            {department.mandate}
+                        </p>
                     </>
                 ) : null}
                 {contacts.length > 0 ? (
                     <div
                         className={`${department.mandate ? 'mt-6 border-t border-line pt-5' : ''} grid max-w-3xl gap-2 ${contacts.length > 1 ? 'sm:grid-cols-2' : ''}`}
                     >
-                        {contacts.map((contact) => (
-                            <ContactLink key={contact.key} {...contact} />
+                        {contacts.map(({ key, ...contact }) => (
+                            <ContactLink key={key} {...contact} />
                         ))}
                     </div>
                 ) : null}
@@ -99,13 +109,25 @@ function ContactLink({
     icon: LucideIcon;
 }) {
     return (
-        <a href={href} className="group flex min-h-16 items-center gap-3 rounded-xl px-2 py-2 text-start hover:bg-paper">
+        <a
+            href={href}
+            className="group flex min-h-16 items-center gap-3 rounded-xl px-2 py-2 text-start hover:bg-paper"
+        >
             <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[#e7f1ee] text-sea">
-                <Icon className="size-4" strokeWidth={1.75} aria-hidden="true" />
+                <Icon
+                    className="size-4"
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                />
             </span>
             <span className="min-w-0">
-                <span className="block text-xs leading-5 text-[#3E534C]">{label}</span>
-                <span dir="ltr" className="mt-0.5 block text-sm font-medium text-deep group-hover:underline">
+                <span className="block text-xs leading-5 text-[#3E534C]">
+                    {label}
+                </span>
+                <span
+                    dir="ltr"
+                    className="mt-0.5 block text-sm font-medium text-deep group-hover:underline"
+                >
                     {value}
                 </span>
             </span>

@@ -3,23 +3,61 @@ import { ArrowLeft } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 export function PageBody({ children }: { children: ReactNode }) {
-    return <div className="mx-auto max-w-[90rem] px-4 py-8 sm:px-6 lg:px-6 lg:py-10">{children}</div>;
+    return (
+        <div className="mx-auto max-w-[90rem] px-4 py-8 sm:px-6 lg:px-6 lg:py-10">
+            {children}
+        </div>
+    );
 }
 
-export function SectionTitle({ id, children, className = '' }: { id?: string; children: ReactNode; className?: string }) {
+export function SectionTitle({
+    id,
+    children,
+    className = '',
+}: {
+    id?: string;
+    children: ReactNode;
+    className?: string;
+}) {
     return (
-        <h2 id={id} className={`flex items-center gap-2 text-2xl font-medium text-deep ${className}`}>
-            <span className="h-6 w-1 shrink-0 rounded-full bg-deep" aria-hidden="true" />
+        <h2
+            id={id}
+            className={`flex items-center gap-2 text-2xl font-medium text-deep ${className}`}
+        >
+            <span
+                className="h-6 w-1 shrink-0 rounded-full bg-deep"
+                aria-hidden="true"
+            />
             {children}
         </h2>
     );
 }
 
-export function Sheet({ children, className = '' }: { children: ReactNode; className?: string }) {
-    return <div className={`overflow-hidden rounded-2xl border border-line bg-white ${className}`}>{children}</div>;
+export function Sheet({
+    children,
+    className = '',
+}: {
+    children: ReactNode;
+    className?: string;
+}) {
+    return (
+        <div
+            className={`overflow-hidden rounded-2xl border border-line bg-white ${className}`}
+        >
+            {children}
+        </div>
+    );
 }
 
-export function FilterPill({ href, current, children }: { href: string; current: boolean; children: ReactNode }) {
+export function FilterPill({
+    href,
+    current,
+    children,
+}: {
+    href: string;
+    current: boolean;
+    children: ReactNode;
+}) {
     return (
         <Link
             href={href}
@@ -35,7 +73,13 @@ export function FilterPill({ href, current, children }: { href: string; current:
     );
 }
 
-export function ForwardLink({ href, children }: { href: string; children: ReactNode }) {
+export function ForwardLink({
+    href,
+    children,
+}: {
+    href: string;
+    children: ReactNode;
+}) {
     return (
         <Link
             href={href}
@@ -43,7 +87,10 @@ export function ForwardLink({ href, children }: { href: string; children: ReactN
         >
             {children}
             <span className="inline-flex size-8 items-center justify-center rounded-full bg-white/15">
-                <ArrowLeft className="size-4 ltr:scale-x-[-1]" aria-hidden="true" />
+                <ArrowLeft
+                    className="size-4 ltr:scale-x-[-1]"
+                    aria-hidden="true"
+                />
             </span>
         </Link>
     );

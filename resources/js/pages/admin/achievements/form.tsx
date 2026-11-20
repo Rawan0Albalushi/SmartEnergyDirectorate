@@ -1,6 +1,12 @@
 import { Head, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
-import { AreaField, DeleteControl, RecordForm, SelectField, TextField } from '@/components/admin/fields';
+import {
+    AreaField,
+    FieldPair,
+    RecordForm,
+    SelectField,
+    TextField,
+} from '@/components/admin/fields';
 import { useI18n } from '@/lib/i18n';
 import type { Option } from '@/types/content';
 
@@ -35,7 +41,11 @@ export default function AchievementForm({
         summary_ar: achievement?.summary_ar ?? '',
         summary_en: achievement?.summary_en ?? '',
         year: String(achievement?.year ?? new Date().getFullYear()),
-        is_published: achievement ? (achievement.is_published ? '1' : '0') : '1',
+        is_published: achievement
+            ? achievement.is_published
+                ? '1'
+                : '0'
+            : '1',
     });
 
     function submit(event: FormEvent<HTMLFormElement>) {
@@ -50,16 +60,87 @@ export default function AchievementForm({
     return (
         <>
             <Head title={t('achievements')} />
-            <RecordForm title={achievement ? t('edit') : t('create')} errors={form.errors} processing={form.processing} onSubmit={submit} cancelHref={`/${locale}/admin/achievements`}>
-                <SelectField id="sector_id" label={t('sector')} value={form.data.sector_id} error={form.errors.sector_id} onChange={(value) => form.setData('sector_id', value)} options={[{ value: '', label: t('none') }, ...sectors.map((sector) => ({ value: String(sector.id), label: sector.name }))]} />
-                <TextField id="title_ar" label={t('titleAr')} value={form.data.title_ar} error={form.errors.title_ar} onChange={(value) => form.setData('title_ar', value)} required />
-                <TextField id="title_en" label={t('titleEn')} value={form.data.title_en} error={form.errors.title_en} onChange={(value) => form.setData('title_en', value)} required />
-                <AreaField id="summary_ar" label={t('summaryAr')} value={form.data.summary_ar} error={form.errors.summary_ar} onChange={(value) => form.setData('summary_ar', value)} />
-                <AreaField id="summary_en" label={t('summaryEn')} value={form.data.summary_en} error={form.errors.summary_en} onChange={(value) => form.setData('summary_en', value)} />
-                <TextField id="year" label={t('year')} type="number" value={form.data.year} error={form.errors.year} onChange={(value) => form.setData('year', value)} required />
-                <SelectField id="is_published" label={t('visibility')} value={form.data.is_published} error={form.errors.is_published} onChange={(value) => form.setData('is_published', value)} options={[{ value: '1', label: t('visible') }, { value: '0', label: t('hidden') }]} />
+            <RecordForm
+                title={achievement ? t('edit') : t('create')}
+                errors={form.errors}
+                processing={form.processing}
+                onSubmit={submit}
+                cancelHref={`/${locale}/admin/achievements`}
+                deleteUrl={deleteUrl}
+            >
+                <SelectField
+                    id="sector_id"
+                    label={t('sector')}
+                    value={form.data.sector_id}
+                    error={form.errors.sector_id}
+                    onChange={(value) => form.setData('sector_id', value)}
+                    options={[
+                        { value: '', label: t('none') },
+                        ...sectors.map((sector) => ({
+                            value: String(sector.id),
+                            label: sector.name,
+                        })),
+                    ]}
+                />
+                <FieldPair>
+                    <TextField
+                        id="title_ar"
+                        label={t('titleAr')}
+                        value={form.data.title_ar}
+                        error={form.errors.title_ar}
+                        onChange={(value) => form.setData('title_ar', value)}
+                        required
+                    />
+                    <TextField
+                        id="title_en"
+                        label={t('titleEn')}
+                        value={form.data.title_en}
+                        error={form.errors.title_en}
+                        onChange={(value) => form.setData('title_en', value)}
+                        required
+                    />
+                </FieldPair>
+                <FieldPair>
+                    <AreaField
+                        id="summary_ar"
+                        label={t('summaryAr')}
+                        value={form.data.summary_ar}
+                        error={form.errors.summary_ar}
+                        onChange={(value) => form.setData('summary_ar', value)}
+                    />
+                    <AreaField
+                        id="summary_en"
+                        label={t('summaryEn')}
+                        value={form.data.summary_en}
+                        error={form.errors.summary_en}
+                        onChange={(value) => form.setData('summary_en', value)}
+                    />
+                </FieldPair>
+                <FieldPair>
+                    <TextField
+                        id="year"
+                        label={t('year')}
+                        type="number"
+                        value={form.data.year}
+                        error={form.errors.year}
+                        onChange={(value) => form.setData('year', value)}
+                        required
+                    />
+                    <SelectField
+                        id="is_published"
+                        label={t('visibility')}
+                        value={form.data.is_published}
+                        error={form.errors.is_published}
+                        onChange={(value) =>
+                            form.setData('is_published', value)
+                        }
+                        options={[
+                            { value: '1', label: t('visible') },
+                            { value: '0', label: t('hidden') },
+                        ]}
+                    />
+                </FieldPair>
             </RecordForm>
-            {deleteUrl ? <div className="mt-6"><DeleteControl url={deleteUrl} /></div> : null}
         </>
     );
 }

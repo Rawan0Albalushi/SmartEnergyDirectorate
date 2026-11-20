@@ -27,7 +27,10 @@ export default function ProjectsIndex({
             <PageIntro title={t('projects')} lede={t('projectsIntro')} />
             <PageBody>
                 <nav className="flex flex-wrap gap-2" aria-label={t('sectors')}>
-                    <FilterPill href={`/${locale}/projects`} current={activeSector === null}>
+                    <FilterPill
+                        href={`/${locale}/projects`}
+                        current={activeSector === null}
+                    >
                         <LayoutGrid className="size-3.5" aria-hidden="true" />
                         {t('all')}
                     </FilterPill>
@@ -37,13 +40,20 @@ export default function ProjectsIndex({
                             href={`/${locale}/projects?sector=${sector.slug}`}
                             current={activeSector === sector.slug}
                         >
-                            <SectorGlyph slug={sector.slug} className="size-3.5" />
+                            <SectorGlyph
+                                slug={sector.slug}
+                                className="size-3.5"
+                            />
                             {sector.name}
                         </FilterPill>
                     ))}
                 </nav>
 
-                {projects.length === 0 ? <p className="mt-6 text-sm text-[#3E534C]">{t('emptyProjects')}</p> : null}
+                {projects.length === 0 ? (
+                    <p className="mt-6 text-sm text-[#3E534C]">
+                        {t('emptyProjects')}
+                    </p>
+                ) : null}
 
                 <ul className="mt-6 grid list-none gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
                     {projects.map((project, index) => (

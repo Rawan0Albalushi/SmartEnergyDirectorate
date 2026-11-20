@@ -43,11 +43,19 @@ export function SiteHeader() {
         <header className="fixed inset-x-0 top-0 z-40 px-3 pt-3 sm:px-4 lg:px-6">
             <div className="mx-auto max-w-6xl rounded-[1.25rem] border border-white/70 bg-paper/95 shadow-[0_12px_32px_-20px_rgba(12,46,42,0.65)] backdrop-blur-md supports-[backdrop-filter]:bg-paper/80">
                 <div className="flex items-center gap-2 px-3 py-2 sm:px-4 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-4">
-                    <Link href={`/${locale}`} className="flex min-h-11 min-w-0 items-center gap-3 overflow-hidden">
+                    <Link
+                        href={`/${locale}`}
+                        className="flex min-h-11 min-w-0 items-center gap-3 overflow-hidden"
+                    >
                         <Mark className="size-9 shrink-0" />
-                        <span className="min-w-0 text-sm font-medium leading-5 text-ink sm:truncate sm:text-base">{t('siteName')}</span>
+                        <span className="min-w-0 text-sm leading-5 font-medium text-ink sm:truncate sm:text-base">
+                            {t('siteName')}
+                        </span>
                     </Link>
-                    <nav className="hidden items-center justify-center gap-0.5 lg:flex" aria-label={t('mainNav')}>
+                    <nav
+                        className="hidden items-center justify-center gap-0.5 lg:flex"
+                        aria-label={t('mainNav')}
+                    >
                         {links.map((link) => (
                             <NavLink
                                 key={link.key}
@@ -59,7 +67,11 @@ export function SiteHeader() {
                         ))}
                     </nav>
                     <div className="ms-auto flex shrink-0 items-center lg:ms-0 lg:justify-self-end">
-                        <LanguageSwitch alternates={alternates} locale={locale} label={t('languageSwitch')} />
+                        <LanguageSwitch
+                            alternates={alternates}
+                            locale={locale}
+                            label={t('languageSwitch')}
+                        />
                         <button
                             type="button"
                             className="inline-flex size-11 items-center justify-center rounded-lg text-ink lg:hidden"
@@ -67,8 +79,13 @@ export function SiteHeader() {
                             aria-controls="site-menu"
                             onClick={() => setOpen((value) => !value)}
                         >
-                            <span className="sr-only">{open ? t('closeMenu') : t('menu')}</span>
-                            <span aria-hidden="true" className="flex w-4 flex-col gap-1">
+                            <span className="sr-only">
+                                {open ? t('closeMenu') : t('menu')}
+                            </span>
+                            <span
+                                aria-hidden="true"
+                                className="flex w-4 flex-col gap-1"
+                            >
                                 <span className="h-px bg-ink" />
                                 <span className="h-px bg-ink" />
                                 <span className="h-px bg-ink" />
@@ -77,12 +94,20 @@ export function SiteHeader() {
                     </div>
                 </div>
                 {open ? (
-                    <nav id="site-menu" className="border-t border-line/80 px-3 py-1 sm:px-4 lg:hidden" aria-label={t('mainNav')}>
+                    <nav
+                        id="site-menu"
+                        className="border-t border-line/80 px-3 py-1 sm:px-4 lg:hidden"
+                        aria-label={t('mainNav')}
+                    >
                         {links.map((link) => (
                             <Link
                                 key={link.key}
                                 href={`/${locale}${link.path}`}
-                                aria-current={isCurrent(path, locale, link.path) ? 'page' : undefined}
+                                aria-current={
+                                    isCurrent(path, locale, link.path)
+                                        ? 'page'
+                                        : undefined
+                                }
                                 className="flex min-h-11 items-center border-b border-line/80 text-base last:border-b-0"
                             >
                                 {t(link.key)}
