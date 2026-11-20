@@ -173,7 +173,7 @@ export function RecordForm({
     return (
         <form
             onSubmit={onSubmit}
-            className="max-w-3xl overflow-hidden rounded-[8px] border border-line bg-white"
+            className="w-full overflow-hidden rounded-[8px] border border-line bg-white"
         >
             <div className="border-b border-line px-5 py-5 sm:px-7">
                 <h1 className="text-[1.75rem] leading-tight font-medium tracking-[-0.02em]">
